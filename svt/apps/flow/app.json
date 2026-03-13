@@ -1,0 +1,50 @@
+{
+    "name": "flow",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "Flow control: if/elif/else, while, for loops",
+    "module": "app",
+    "commands": {
+        "if": {
+            "description": "Conditional block (if/elif/else/end)",
+            "block": true
+        },
+        "elif": {
+            "description": "Else-if branch (used within if block)",
+            "block": true
+        },
+        "else": {
+            "description": "Else branch (used within if block)",
+            "block": true
+        },
+        "while": {
+            "description": "While loop block",
+            "block": true
+        },
+        "for": {
+            "description": "For loop block (for var in list)",
+            "block": true
+        },
+        "end": {
+            "description": "End a block"
+        },
+        "break": {
+            "description": "Break out of a loop"
+        },
+        "continue": {
+            "description": "Skip to next iteration of a loop"
+        },
+        "_block_if": {
+            "description": "Internal: execute if block",
+            "handler": "handle_block_if"
+        },
+        "_block_while": {
+            "description": "Internal: execute while block",
+            "handler": "handle_block_while"
+        },
+        "_block_for": {
+            "description": "Internal: execute for block",
+            "handler": "handle_block_for"
+        }
+    }
+}

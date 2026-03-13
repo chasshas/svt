@@ -1,0 +1,28 @@
+{
+    "name": "io",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "Input/output commands: print, input, format",
+    "module": "app",
+    "commands": {
+        "print": {
+            "description": "Print text to the terminal",
+            "args": [{"name": "text", "type": "string"}],
+            "options": {
+                "n": {"type": "bool", "description": "No newline at end"}
+            }
+        },
+        "input": {
+            "description": "Read input from the user",
+            "args": [{"name": "prompt", "type": "string", "optional": true}]
+        },
+        "println": {
+            "description": "Print text followed by a newline",
+            "args": [{"name": "text", "type": "string", "optional": true}]
+        },
+        "error": {
+            "description": "Print error message to stderr",
+            "args": [{"name": "text", "type": "string"}]
+        }
+    }
+}

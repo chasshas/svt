@@ -1,0 +1,53 @@
+{
+    "name": "math",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "Math operations: arithmetic, comparison, and utilities",
+    "module": "app",
+    "commands": {
+        "add": {
+            "description": "Add two numbers",
+            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
+        },
+        "sub": {
+            "description": "Subtract b from a",
+            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
+        },
+        "mul": {
+            "description": "Multiply two numbers",
+            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
+        },
+        "div": {
+            "description": "Divide a by b",
+            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
+        },
+        "mod": {
+            "description": "Modulo (a % b)",
+            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
+        },
+        "pow": {
+            "description": "Power (a ** b)",
+            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
+        },
+        "abs": {
+            "description": "Absolute value",
+            "args": [{"name": "a", "type": "number"}]
+        },
+        "max": {
+            "description": "Maximum of values",
+            "args": [{"name": "values", "type": "number"}]
+        },
+        "min": {
+            "description": "Minimum of values",
+            "args": [{"name": "values", "type": "number"}]
+        },
+        "range": {
+            "description": "Generate a range of numbers (start end [step])",
+            "args": [
+                {"name": "start", "type": "int"},
+                {"name": "end", "type": "int"},
+                {"name": "step", "type": "int", "optional": true}
+            ]
+        }
+    }
+}

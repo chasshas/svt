@@ -1,0 +1,33 @@
+{
+    "name": "sys",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "System commands: exit, help, app management",
+    "module": "app",
+    "commands": {
+        "exit": {
+            "description": "Exit the SVT terminal",
+            "args": [{"name": "code", "type": "int", "optional": true}]
+        },
+        "help": {
+            "description": "Show help for an app or command",
+            "args": [{"name": "target", "type": "string", "optional": true}]
+        },
+        "apps": {
+            "description": "List all loaded apps"
+        },
+        "version": {
+            "description": "Show SVT version"
+        },
+        "info": {
+            "description": "Show detailed info about an app",
+            "args": [{"name": "app_name", "type": "string"}]
+        },
+        "reload": {
+            "description": "Reload all apps"
+        },
+        "clear": {
+            "description": "Clear the terminal screen"
+        }
+    }
+}

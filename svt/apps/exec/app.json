@@ -1,0 +1,25 @@
+{
+    "name": "exec",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "Script execution: run files, evaluate code strings",
+    "module": "app",
+    "commands": {
+        "run": {
+            "description": "Execute an SVT script file",
+            "args": [{"name": "filepath", "type": "string"}]
+        },
+        "eval": {
+            "description": "Execute an SVT command string",
+            "args": [{"name": "code", "type": "string"}]
+        },
+        "file": {
+            "description": "Execute an SVT script from a file path (alias for run)",
+            "args": [{"name": "filepath", "type": "string"}]
+        },
+        "lines": {
+            "description": "Execute multiple semicolon-separated commands",
+            "args": [{"name": "code", "type": "string"}]
+        }
+    }
+}

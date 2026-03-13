@@ -1,0 +1,38 @@
+{
+    "name": "event",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "Event system: listen, emit, and manage events",
+    "module": "app",
+    "commands": {
+        "on": {
+            "description": "Register an event listener",
+            "args": [
+                {"name": "event_name", "type": "string"},
+                {"name": "handler_command", "type": "string"}
+            ]
+        },
+        "once": {
+            "description": "Register a one-time event listener",
+            "args": [
+                {"name": "event_name", "type": "string"},
+                {"name": "handler_command", "type": "string"}
+            ]
+        },
+        "off": {
+            "description": "Remove a listener by ID",
+            "args": [{"name": "listener_id", "type": "int"}]
+        },
+        "emit": {
+            "description": "Emit an event",
+            "args": [{"name": "event_name", "type": "string"}]
+        },
+        "list": {
+            "description": "List registered events and listeners"
+        },
+        "clear": {
+            "description": "Remove all listeners for an event",
+            "args": [{"name": "event_name", "type": "string"}]
+        }
+    }
+}
