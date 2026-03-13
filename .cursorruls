@@ -1,0 +1,32 @@
+# SVT (Scriptable Virtual Terminal) Project Rules for Cursor AI
+
+You are working on the SVT project, a pure Python, zero-dependency, plugin-based terminal application.
+Read and strictly adhere to the following rules before proposing any code changes.
+
+## 1. Absolute Architecture Rule: "Everything is an app"
+- NEVER add features, commands, or domain logic to `core/engine.py` or the `core/` directory.
+- Every user-facing feature exists as a standalone app in the `apps/` directory.
+- The engine ONLY parses, dispatches, and collects blocks.
+
+## 2. App Isolation & Communication
+- Apps MUST NEVER import another app directly (e.g., `from apps.math import ...` is forbidden).
+- Cross-app communication must be done using `ctx.execute("app:cmd args")` or the EventBus.
+
+## 3. SDK as the Only Bridge
+- Apps interact with the engine SOLELY through `svt.sdk` (`ExecutionContext`, `VariableStore`, `EventBus`, `CommandResult`).
+- Direct engine mutation from app code is strictly forbidden.
+
+## 4. Type Flow & Argument Handling
+- SVT is dynamically typed, and types propagate. `ctx.args` contains actual Python objects (int, float, dict, list, bool), not just strings.
+- Only cast to string (`str(ctx.args[0])`) when the operation strictly requires a string.
+- When creating variables, use proper types (e.g., `ctx.variables.set("my_var", 42)` stores an integer).
+
+## 5. Result and Error Handling
+- Every command handler MUST return a `CommandResult` (e.g., `CommandResult.success()`, `CommandResult.error()`, `CommandResult.exit_signal()`).
+- `CommandResult.error("msg")` is a SOFT error. It prints to the REPL but does not interrupt the flow.
+- For HARD errors that should be caught by `flow:try/catch`, use `raise SVTException("msg")`.
+- NEVER catch `SVTException`, `FlowBreak`, or `FlowContinue` with a generic `except Exception:` block in your handler. Let them propagate to the base `SVTApp.execute_command()` method.
+
+## 6. Development Workflow
+- When creating a new command, add it to an existing app or create a new directory under `apps/` with `app.json` and `app.py`.
+- If creating a new block-starting command (like if/while/try), you must also register it in `core/engine.py`'s `BLOCK_STARTERS`.
