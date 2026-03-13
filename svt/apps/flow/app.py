@@ -1,8 +1,7 @@
-"""SVT Flow App - Flow control: conditionals and loops."""
+"""SVT Flow App - Flow control: conditionals, loops, try/catch, throw."""
 
 import operator
-import re
-from svt.sdk import SVTApp, CommandResult, CommandResultStatus, ExecutionContext
+from svt.sdk import SVTApp, CommandResult, CommandResultStatus, ExecutionContext, SVTException
 
 
 class FlowBreak(Exception):
@@ -29,10 +28,13 @@ class FlowApp(SVTApp):
     def cmd_continue(self, ctx: ExecutionContext) -> CommandResult:
         raise FlowContinue()
 
+    def cmd_throw(self, ctx: ExecutionContext) -> CommandResult:
+        msg = ' '.join(ctx.args) if ctx.args else "Unknown error"
+        raise SVTException(msg)
+
     # ── Condition Evaluation ────────────────────────────────────
 
     def _coerce_value(self, val: str):
-        """Convert a string token to its appropriate Python type."""
         if val.lower() == 'true':
             return True
         if val.lower() == 'false':
@@ -47,32 +49,16 @@ class FlowApp(SVTApp):
             return float(val)
         except (ValueError, TypeError):
             pass
-        # Strip surrounding quotes if present
         if len(val) >= 2 and val[0] == val[-1] and val[0] in ('"', "'"):
             return val[1:-1]
         return val
 
     def evaluate_condition(self, expr: str, ctx: ExecutionContext) -> bool:
-        """Evaluate a condition expression string.
-
-        Supports:
-          - comparison: value1 op value2
-          - logical: expr1 && expr2, expr1 || expr2
-          - negation: ! expr
-          - grouping: ( expr )
-          - truthiness: single value
-        """
         expr = expr.strip()
         if not expr:
             return False
-
-        # Resolve variables and substitutions first
         expr = ctx.engine.interpreter._interpolate_string(expr)
-
-        # Handle logical operators (lowest precedence)
-        # Split on || first (lower precedence than &&)
-        or_result = self._eval_or(expr, ctx)
-        return or_result
+        return self._eval_or(expr, ctx)
 
     def _eval_or(self, expr: str, ctx: ExecutionContext) -> bool:
         parts = self._split_logical(expr, '||')
@@ -94,37 +80,23 @@ class FlowApp(SVTApp):
 
     def _eval_atom(self, expr: str, ctx: ExecutionContext) -> bool:
         expr = expr.strip()
-
-        # Negation
         if expr.startswith('!'):
-            inner = expr[1:].strip()
-            return not self._eval_atom(inner, ctx)
-
-        # Parentheses
+            return not self._eval_atom(expr[1:].strip(), ctx)
         if expr.startswith('(') and expr.endswith(')'):
             return self.evaluate_condition(expr[1:-1], ctx)
-
-        # Comparison operators
         for op_str in sorted(self.OPERATORS.keys(), key=len, reverse=True):
-            # Find the operator, avoiding splitting inside strings
             idx = self._find_operator(expr, op_str)
             if idx >= 0:
-                left = expr[:idx].strip()
-                right = expr[idx + len(op_str):].strip()
-                left_val = self._coerce_value(left)
-                right_val = self._coerce_value(right)
-                # Ensure comparable types
+                left_val = self._coerce_value(expr[:idx].strip())
+                right_val = self._coerce_value(expr[idx + len(op_str):].strip())
                 try:
                     return self.OPERATORS[op_str](left_val, right_val)
                 except TypeError:
                     return self.OPERATORS[op_str](str(left_val), str(right_val))
-
-        # Truthiness check
         val = self._coerce_value(expr)
         return bool(val)
 
     def _find_operator(self, expr: str, op: str) -> int:
-        """Find operator position, ignoring operators inside strings."""
         i = 0
         while i < len(expr):
             if expr[i] in ('"', "'"):
@@ -136,7 +108,6 @@ class FlowApp(SVTApp):
                     i += 1
                 i += 1
             elif expr[i:i + len(op)] == op:
-                # Make sure it's not part of a longer operator
                 before = expr[i - 1] if i > 0 else ' '
                 after = expr[i + len(op)] if i + len(op) < len(expr) else ' '
                 if before in (' ', '\t', ')') or after in (' ', '\t', '('):
@@ -147,7 +118,6 @@ class FlowApp(SVTApp):
         return -1
 
     def _split_logical(self, expr: str, sep: str) -> list[str]:
-        """Split expression by logical operator, respecting parentheses and strings."""
         parts = []
         current = []
         depth = 0
@@ -192,18 +162,15 @@ class FlowApp(SVTApp):
         if not block:
             return CommandResult.error("No block data for if")
 
-        # Evaluate main condition
         if self.evaluate_condition(block.condition, ctx):
             return ctx.execute_lines(block.body) or CommandResult.success()
 
-        # Check elif branches
         for elif_cond, elif_body in block.elif_branches:
             if elif_body is None:
                 continue
             if self.evaluate_condition(elif_cond, ctx):
                 return ctx.execute_lines(elif_body) or CommandResult.success()
 
-        # Else branch
         if block.else_body:
             return ctx.execute_lines(block.else_body) or CommandResult.success()
 
@@ -220,10 +187,9 @@ class FlowApp(SVTApp):
         while self.evaluate_condition(block.condition, ctx) and i < max_iterations:
             try:
                 result = ctx.execute_lines(block.body)
-                if result:
-                    if result.status == CommandResultStatus.EXIT:
-                        return result
-                    last_result = result
+                if result and result.status == CommandResultStatus.EXIT:
+                    return result
+                last_result = result
             except FlowBreak:
                 break
             except FlowContinue:
@@ -240,25 +206,19 @@ class FlowApp(SVTApp):
             return CommandResult.error("No block data for for")
 
         var_name = block.iterator_var
-        iterable_expr = block.iterable_expr
-
-        # Resolve the iterable
-        resolved = ctx.engine.interpreter._interpolate_string(iterable_expr)
-
-        # Try to interpret as a list or range
+        resolved = ctx.engine.interpreter._interpolate_string(block.iterable_expr)
         items = self._resolve_iterable(resolved, ctx)
         if items is None:
-            return CommandResult.error(f"Cannot iterate over: {iterable_expr}")
+            return CommandResult.error(f"Cannot iterate over: {block.iterable_expr}")
 
         last_result = None
         for item in items:
             ctx.variables.set(var_name, item)
             try:
                 result = ctx.execute_lines(block.body)
-                if result:
-                    if result.status == CommandResultStatus.EXIT:
-                        return result
-                    last_result = result
+                if result and result.status == CommandResultStatus.EXIT:
+                    return result
+                last_result = result
             except FlowBreak:
                 break
             except FlowContinue:
@@ -266,16 +226,45 @@ class FlowApp(SVTApp):
 
         return last_result or CommandResult.success()
 
+    def handle_block_try(self, ctx: ExecutionContext) -> CommandResult:
+        """Execute try/catch/finally block."""
+        block = ctx.block
+        if not block:
+            return CommandResult.error("No block data for try")
+
+        last_result = None
+        caught = False
+        try:
+            last_result = ctx.execute_lines(block.body)
+            # Also treat CommandResult errors as catchable if there's no exception
+        except SVTException as e:
+            caught = True
+            if block.catch_body:
+                ctx.variables.set_local(block.catch_var or "_err", e.svt_message)
+                last_result = ctx.execute_lines(block.catch_body)
+            else:
+                # No catch block → re-raise
+                raise
+        except (FlowBreak, FlowContinue):
+            # These propagate through try blocks
+            if block.finally_body:
+                ctx.execute_lines(block.finally_body)
+            raise
+        finally:
+            if block.finally_body:
+                ctx.execute_lines(block.finally_body)
+
+        return last_result or CommandResult.success()
+
     def _resolve_iterable(self, expr: str, ctx: ExecutionContext):
-        """Resolve an expression to an iterable (list, range, etc.)."""
         expr = expr.strip()
 
-        # Check if it's a variable that holds a list
         val = ctx.variables.get(expr)
         if isinstance(val, (list, tuple)):
             return val
+        if isinstance(val, dict):
+            return list(val.keys())
 
-        # Range syntax: start..end or start..end..step
         if '..' in expr:
             parts = expr.split('..')
             try:
@@ -286,15 +275,11 @@ class FlowApp(SVTApp):
             except ValueError:
                 pass
 
-        # Space-separated values
         if ' ' in expr:
             return expr.split()
-
-        # Comma-separated values
         if ',' in expr:
             return [v.strip() for v in expr.split(',')]
 
-        # Single value
         if val is not None:
             return [val]
         return [expr] if expr else None

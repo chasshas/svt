@@ -47,22 +47,34 @@ class ParsedCommand:
 
 @dataclass
 class BlockData:
-    block_type: str = ""            # "if", "while", "for"
-    condition: str = ""             # condition expression
-    body: list = field(default_factory=list)           # main body lines
-    elif_branches: list = field(default_factory=list)  # [(condition, [lines]), ...]
-    else_body: list = field(default_factory=list)      # else branch lines
-    iterator_var: str = ""          # for-loop variable name
-    iterable_expr: str = ""         # for-loop iterable expression
+    block_type: str = ""            # "if", "while", "for", "try"
+    condition: str = ""
+    body: list = field(default_factory=list)
+    elif_branches: list = field(default_factory=list)
+    else_body: list = field(default_factory=list)
+    iterator_var: str = ""
+    iterable_expr: str = ""
+    # try/catch/finally support
+    catch_var: str = ""             # variable name to bind exception message
+    catch_body: list = field(default_factory=list)
+    finally_body: list = field(default_factory=list)
+
+
+class SVTException(Exception):
+    """Exception raised by flow:throw. Carries an error message through the stack."""
+    def __init__(self, message: str = "", value: Any = None):
+        super().__init__(message)
+        self.svt_message = message
+        self.svt_value = value
 
 
 @dataclass
 class CommandDef:
     name: str = ""
     description: str = ""
-    handler: Optional[str] = None   # Python handler method name
-    file: Optional[str] = None      # Script file path
-    block: bool = False             # Whether this is a block command
+    handler: Optional[str] = None
+    file: Optional[str] = None
+    block: bool = False
     args: list = field(default_factory=list)
     options: dict = field(default_factory=dict)
 
@@ -73,6 +85,6 @@ class AppManifest:
     version: str = "1.0.0"
     app_type: AppType = AppType.PYTHON
     description: str = ""
-    module: str = "app"             # Python module name
-    commands: dict = field(default_factory=dict)  # name -> CommandDef
-    path: str = ""                  # Filesystem path to app directory
+    module: str = "app"
+    commands: dict = field(default_factory=dict)
+    path: str = ""

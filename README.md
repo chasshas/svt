@@ -1,97 +1,137 @@
-# SVT — Scriptable Virtual Terminal
+# SVT v1.1 — Scriptable Virtual Terminal
 
-순수 Python으로 구현된 플러그인 기반 터미널 애플리케이션.
-모든 기능이 **앱(App)** 단위로 분리되어 있으며, `앱:커맨드` 형식으로 호출합니다.
+순수 Python 플러그인 기반 터미널. 모든 기능이 `앱:커맨드` 형태의 독립 앱으로 존재합니다.
 
-## 실행 방법
+## 실행
 
 ```bash
-# svt/ 폴더의 상위 디렉토리에서:
 python -m svt                    # 인터랙티브 REPL
-python -m svt script.svt         # 스크립트 파일 실행
-python -m svt -e "io:print Hi"   # 인라인 커맨드 실행
+python -m svt script.svt         # 스크립트 실행
+python -m svt -e "io:print Hi"   # 인라인 실행
 ```
 
 ## 프로젝트 구조
 
 ```
 svt/
-├── main.py                 # 진입점
-├── core/
-│   ├── interpreter.py      # 토크나이저 + 파서
-│   ├── engine.py           # 실행 엔진 (REPL, 블록, 디스패치)
-│   └── loader.py           # 앱 디스커버리 및 로딩
-├── sdk/
-│   ├── types.py            # AppManifest, CommandResult, BlockData
-│   ├── context.py          # ExecutionContext, VariableStore, EventBus
-│   └── base.py             # SVTApp 베이스 클래스
-└── apps/                   # 내장 앱
-    ├── sys/   var/   io/   flow/   exec/   event/   math/
+├── main.py              # 진입점
+├── core/                # 엔진 (파서, 디스패처, 블록 수집)
+├── sdk/                 # 앱 개발용 SDK (ExecutionContext, VariableStore, EventBus)
+├── apps/                # 내장 앱 8개 (105개 커맨드)
+│   ├── sys/   var/   io/   flow/   exec/   event/   math/   shell/
+├── docs/                # 상세 문서
+│   ├── architecture.md      # 아키텍처 심층 분석
+│   ├── app-development.md   # 앱 개발 가이드
+│   ├── command-reference.md # 전체 커맨드 레퍼런스 (105개)
+│   └── data-structures.md   # 자료구조 / 파일 형식
+├── CLAUDE.md            # Claude Code 프로젝트 컨텍스트
+├── AGENTS.md            # 범용 AI 에이전트 컨텍스트
+├── .cursorrules         # Cursor IDE 규칙
+├── .windsurfrules       # Windsurf 규칙
+└── .github/copilot-instructions.md
 ```
 
-## 문법 요약
+## 문법
 
 ```bash
-앱:커맨드 인자1 "인자2" --옵션 값       # 기본 호출
-var:set x 10                            # 변수 설정
-io:print "Hello $x"                     # 더블쿼트: 변수 치환 O
-var:set r $(math:add $x 20)             # $(...) 커맨드 치환
-exec:lines 'cmd1; cmd2; cmd3'           # 싱글쿼트: 리터럴 (치환 X)
+앱:커맨드 인자1 "인자2" --옵션 값     # 기본 호출
+var:set x 10                          # 변수 설정
+io:print "Hello $x"                   # 더블쿼트: 변수치환 O
+var:set r $(math:add $x 20)           # $(...) 커맨드 치환
+exec:lines 'cmd1; cmd2'              # 싱글쿼트: 리터럴 (치환 X)
+```
+
+## 오브젝트 (Dictionary)
+
+```bash
+var:obj_new user
+var:obj_set user name "Alice"
+io:print "$user.name"                  # 도트 표기법
+io:print "${user.name}"                # 중괄호 형태
+flow:for key in user                   # dict 키 순회
+  io:print "$key = $(var:obj_get user $key)"
+flow:end
+```
+
+## 변수 스코프
+
+```bash
+var:set x 100                          # 글로벌
+var:scope_push                         # 로컬 스코프 생성
+var:local y 200                        # 현재 스코프에만
+var:global g 777                       # 항상 글로벌에
+var:scope_pop                          # y 소멸
 ```
 
 ## 흐름 제어
 
 ```bash
-# 조건문                     # While 루프                # For 루프
-flow:if $x == 42             flow:while $i < 5           flow:for n in 1..10
-  io:print "yes"               var:incr i                  io:print "$n"
-flow:elif $x > 42            flow:end                    flow:end
+flow:if $x == 42          flow:while $i < 5       flow:for n in 1..10
+  io:print "yes"            var:incr i               io:print "$n"
+flow:elif $x > 42         flow:end                 flow:end
   io:print "high"
-flow:else                    # 연산자: == != < > <= >=
-  io:print "low"             #         && || !
+flow:else
+  io:print "low"
+flow:end
+
+flow:try                               flow:throw "에러 메시지"
+  flow:throw "problem"
+flow:catch err
+  io:print "잡음: $err"
+flow:finally
+  io:print "항상 실행"
 flow:end
 ```
+
+## Shell (OS 연동)
+
+```bash
+var:set files $(shell:exec ls -la)     # stdout 캡처
+shell:run make build                    # 실시간 출력
+shell:pipe ver uname -r                 # 변수에 저장
+shell:cd /tmp                           # 디렉토리 이동
+var:set home $(shell:env HOME)          # 환경변수
+```
+
+## Math (41개 커맨드)
+
+산술(`add sub mul div mod pow abs max min range`),
+삼각함수(`sin cos tan asin acos atan atan2 deg rad`),
+로그(`log log2 log10 exp`), 제곱근(`sqrt cbrt`),
+반올림(`ceil floor round trunc`), 상수(`pi e tau inf`),
+난수(`rand randint`), 집계(`sum avg`), 변환(`hex bin int float`)
 
 ## 이벤트 시스템
 
 ```bash
-event:on var.changed.score 'io:print "changed!"'
-var:set score 100   # → "changed!" 출력
+event:on var.changed.score 'io:print "변경!"'
+var:set score 100                      # → "변경!"
 event:emit custom_event
 ```
 
+## 내장 앱 요약 (8개, 105개 커맨드)
+
+| 앱 | 수 | 설명 |
+|----|-----|------|
+| sys | 7 | exit, help, apps, version, info, reload, clear |
+| var | 22 | set/get/del + scope + obj (dict) |
+| io | 4 | print, println, input, error |
+| flow | 12 | if/elif/else, while, for, try/catch/finally, throw |
+| exec | 4 | run, eval, lines, file |
+| event | 6 | on, once, off, emit, list, clear |
+| math | 41 | 산술, 삼각함수, 로그, 반올림, 상수, 난수, 변환 |
+| shell | 9 | exec, run, pipe, env, setenv, cd, pwd, which, exit_code |
+
 ## 앱 개발
 
-### Python 앱
+`docs/app-development.md` 참고. 요약:
 
-`apps/myapp/app.json`:
-```json
-{"name":"myapp","type":"python","commands":{"hello":{"description":"Say hi"}}}
-```
-
-`apps/myapp/app.py`:
 ```python
+# apps/myapp/app.py
 from svt.sdk import SVTApp, CommandResult, ExecutionContext
 
 class MyApp(SVTApp):
     def cmd_hello(self, ctx: ExecutionContext) -> CommandResult:
-        name = ctx.args[0] if ctx.args else "World"
+        name = str(ctx.args[0]) if ctx.args else "World"
         print(f"Hello, {name}!")
         return CommandResult.success(value=name)
-```
-
-### Script 앱
-
-`apps/myapp/greet.svt` (첫 줄에 인자/옵션 선언):
-```bash
-#!svt name:string --greeting/-g:string=Hello
-io:print "${greeting}, ${name}!"
-```
-
-### SDK 핵심 API
-
-- `ctx.args` / `ctx.options` — 파싱된 인자/옵션
-- `ctx.variables` — VariableStore (set/get/delete/exists/list_all)
-- `ctx.events` — EventBus (on/off/emit)
-- `ctx.execute("cmd")` / `ctx.execute_lines([...])` — 커맨드 실행
-- `CommandResult.success(value=...)` / `.error(msg)` / `.exit_signal(code)`

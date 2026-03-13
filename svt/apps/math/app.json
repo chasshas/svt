@@ -1,53 +1,57 @@
 {
     "name": "math",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "type": "python",
-    "description": "Math operations: arithmetic, comparison, and utilities",
+    "description": "Math operations: arithmetic, trigonometry, logarithms, rounding, constants",
     "module": "app",
     "commands": {
-        "add": {
-            "description": "Add two numbers",
-            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
-        },
-        "sub": {
-            "description": "Subtract b from a",
-            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
-        },
-        "mul": {
-            "description": "Multiply two numbers",
-            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
-        },
-        "div": {
-            "description": "Divide a by b",
-            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
-        },
-        "mod": {
-            "description": "Modulo (a % b)",
-            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
-        },
-        "pow": {
-            "description": "Power (a ** b)",
-            "args": [{"name": "a", "type": "number"}, {"name": "b", "type": "number"}]
-        },
-        "abs": {
-            "description": "Absolute value",
-            "args": [{"name": "a", "type": "number"}]
-        },
-        "max": {
-            "description": "Maximum of values",
-            "args": [{"name": "values", "type": "number"}]
-        },
-        "min": {
-            "description": "Minimum of values",
-            "args": [{"name": "values", "type": "number"}]
-        },
-        "range": {
-            "description": "Generate a range of numbers (start end [step])",
-            "args": [
-                {"name": "start", "type": "int"},
-                {"name": "end", "type": "int"},
-                {"name": "step", "type": "int", "optional": true}
-            ]
-        }
+        "add":   { "description": "Add two numbers", "args": [{"name":"a"},{"name":"b"}] },
+        "sub":   { "description": "Subtract b from a", "args": [{"name":"a"},{"name":"b"}] },
+        "mul":   { "description": "Multiply two numbers", "args": [{"name":"a"},{"name":"b"}] },
+        "div":   { "description": "Divide a by b", "args": [{"name":"a"},{"name":"b"}] },
+        "mod":   { "description": "Modulo (a % b)", "args": [{"name":"a"},{"name":"b"}] },
+        "pow":   { "description": "Power (a ** b)", "args": [{"name":"a"},{"name":"b"}] },
+        "abs":   { "description": "Absolute value", "args": [{"name":"a"}] },
+        "max":   { "description": "Maximum of values", "args": [{"name":"values"}] },
+        "min":   { "description": "Minimum of values", "args": [{"name":"values"}] },
+        "range": { "description": "Generate a range of numbers", "args": [{"name":"start"},{"name":"end"},{"name":"step","optional":true}] },
+
+        "sqrt":  { "description": "Square root", "args": [{"name":"a"}] },
+        "cbrt":  { "description": "Cube root", "args": [{"name":"a"}] },
+        "sin":   { "description": "Sine (radians)", "args": [{"name":"a"}] },
+        "cos":   { "description": "Cosine (radians)", "args": [{"name":"a"}] },
+        "tan":   { "description": "Tangent (radians)", "args": [{"name":"a"}] },
+        "asin":  { "description": "Arcsine → radians", "args": [{"name":"a"}] },
+        "acos":  { "description": "Arccosine → radians", "args": [{"name":"a"}] },
+        "atan":  { "description": "Arctangent → radians", "args": [{"name":"a"}] },
+        "atan2": { "description": "atan2(y, x) → radians", "args": [{"name":"y"},{"name":"x"}] },
+        "deg":   { "description": "Radians to degrees", "args": [{"name":"rad"}] },
+        "rad":   { "description": "Degrees to radians", "args": [{"name":"deg"}] },
+
+        "log":   { "description": "Natural logarithm (ln)", "args": [{"name":"a"}] },
+        "log2":  { "description": "Base-2 logarithm", "args": [{"name":"a"}] },
+        "log10": { "description": "Base-10 logarithm", "args": [{"name":"a"}] },
+        "exp":   { "description": "e raised to the power a", "args": [{"name":"a"}] },
+
+        "ceil":  { "description": "Ceiling (round up)", "args": [{"name":"a"}] },
+        "floor": { "description": "Floor (round down)", "args": [{"name":"a"}] },
+        "round": { "description": "Round to n decimal places", "args": [{"name":"a"},{"name":"n","optional":true}] },
+        "trunc": { "description": "Truncate to integer", "args": [{"name":"a"}] },
+
+        "pi":    { "description": "Return the value of π" },
+        "e":     { "description": "Return the value of e" },
+        "tau":   { "description": "Return the value of τ (2π)" },
+        "inf":   { "description": "Return positive infinity" },
+
+        "rand":  { "description": "Random float [0, 1)", "args": [] },
+        "randint": { "description": "Random integer [a, b]", "args": [{"name":"a"},{"name":"b"}] },
+
+        "sum":   { "description": "Sum all arguments", "args": [{"name":"values"}] },
+        "avg":   { "description": "Average of all arguments", "args": [{"name":"values"}] },
+
+        "hex":   { "description": "Convert integer to hex string", "args": [{"name":"a"}] },
+        "bin":   { "description": "Convert integer to binary string", "args": [{"name":"a"}] },
+        "int":   { "description": "Cast to integer", "args": [{"name":"a"}] },
+        "float": { "description": "Cast to float", "args": [{"name":"a"}] }
     }
 }

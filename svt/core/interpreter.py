@@ -76,9 +76,14 @@ class Tokenizer:
             return ''.join(name)
         else:
             name = []
-            while self.pos < self.length and (self.text[self.pos].isalnum() or self.text[self.pos] == '_'):
+            while self.pos < self.length and (self.text[self.pos].isalnum() or self.text[self.pos] in ('_', '.')):
                 name.append(self.advance())
-            return ''.join(name)
+            # Strip trailing dot (not part of variable)
+            result = ''.join(name)
+            while result.endswith('.'):
+                result = result[:-1]
+                self.pos -= 1
+            return result
 
     def read_word(self) -> str:
         result = []
@@ -122,25 +127,48 @@ class Interpreter:
     def __init__(self, engine: SVTEngine = None):
         self.engine = engine
 
-    def resolve_token_value(self, token: dict) -> str:
+    def _resolve_var_path(self, path: str):
+        """Resolve a dotted variable path like obj.key.subkey.
+        Returns the resolved Python value."""
+        parts = path.split('.')
+        val = self.engine.variables.get(parts[0]) if self.engine else None
+        for key in parts[1:]:
+            if isinstance(val, dict) and key in val:
+                val = val[key]
+            elif isinstance(val, list):
+                try:
+                    val = val[int(key)]
+                except (ValueError, IndexError):
+                    return None
+            else:
+                return None
+        return val
+
+    def resolve_token_value(self, token: dict):
+        """Resolve a token to its value. Returns actual Python object for variables
+        and substitutions (preserves dict/list), strings for everything else."""
         if token["type"] == "variable":
             if self.engine:
-                val = self.engine.variables.get(token["value"])
-                return str(val) if val is not None else ""
+                val = self._resolve_var_path(token["value"])
+                return val if val is not None else ""
             return ""
         elif token["type"] == "substitution":
             if self.engine:
                 result = self.engine.execute_line(token["value"])
                 if result and result.value is not None:
-                    return str(result.value)
+                    return result.value
             return ""
         elif token["type"] == "string":
-            # Only interpolate double-quoted strings; single-quoted are literal
             if token.get("quote") == "'":
                 return token["value"]
             return self._interpolate_string(token["value"])
         else:
             return token["value"]
+
+    def resolve_token_str(self, token: dict) -> str:
+        """Always return a string (for contexts that need it, like app:command name)."""
+        val = self.resolve_token_value(token)
+        return str(val) if val is not None else ""
 
     def _interpolate_string(self, text: str) -> str:
         if not self.engine or '$' not in text:
@@ -152,8 +180,8 @@ class Interpreter:
                 if text[i + 1] == '{':
                     end = text.find('}', i + 2)
                     if end != -1:
-                        var_name = text[i + 2:end]
-                        val = self.engine.variables.get(var_name)
+                        var_path = text[i + 2:end]
+                        val = self._resolve_var_path(var_path)
                         result.append(str(val) if val is not None else "")
                         i = end + 1
                         continue
@@ -173,10 +201,14 @@ class Interpreter:
                     continue
                 elif text[i + 1].isalpha() or text[i + 1] == '_':
                     j = i + 1
-                    while j < len(text) and (text[j].isalnum() or text[j] == '_'):
+                    while j < len(text) and (text[j].isalnum() or text[j] in ('_', '.')):
                         j += 1
-                    var_name = text[i + 1:j]
-                    val = self.engine.variables.get(var_name)
+                    # Strip trailing dots
+                    var_path = text[i + 1:j]
+                    while var_path.endswith('.'):
+                        var_path = var_path[:-1]
+                        j -= 1
+                    val = self._resolve_var_path(var_path)
                     result.append(str(val) if val is not None else "")
                     i = j
                     continue
@@ -195,7 +227,7 @@ class Interpreter:
 
         cmd = ParsedCommand(raw=raw)
         first = tokens[0]
-        first_val = first["value"] if first["type"] == "word" else self.resolve_token_value(first)
+        first_val = first["value"] if first["type"] == "word" else self.resolve_token_str(first)
 
         if ':' in first_val:
             parts = first_val.split(':', 1)

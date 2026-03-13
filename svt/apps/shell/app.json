@@ -1,0 +1,43 @@
+{
+    "name": "shell",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "OS shell integration: execute system commands, read env vars",
+    "module": "app",
+    "commands": {
+        "exec": {
+            "description": "Execute an OS shell command and return its stdout",
+            "args": [{"name": "command", "type": "string"}]
+        },
+        "run": {
+            "description": "Execute an OS shell command, print output, return exit code",
+            "args": [{"name": "command", "type": "string"}]
+        },
+        "pipe": {
+            "description": "Execute a command and store stdout in a variable",
+            "args": [{"name": "varname", "type": "string"}, {"name": "command", "type": "string"}]
+        },
+        "env": {
+            "description": "Get an environment variable",
+            "args": [{"name": "name", "type": "string"}]
+        },
+        "setenv": {
+            "description": "Set an environment variable",
+            "args": [{"name": "name", "type": "string"}, {"name": "value", "type": "string"}]
+        },
+        "cd": {
+            "description": "Change working directory",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "pwd": {
+            "description": "Print working directory"
+        },
+        "which": {
+            "description": "Find a command on PATH",
+            "args": [{"name": "command", "type": "string"}]
+        },
+        "exit_code": {
+            "description": "Get exit code of the last shell:exec/shell:run command"
+        }
+    }
+}

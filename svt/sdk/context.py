@@ -8,41 +8,106 @@ if TYPE_CHECKING:
 
 
 class VariableStore:
-    """Thread-safe variable storage with event emission."""
+    """Variable storage with scope stack and event emission.
+
+    Scope rules:
+      - Global scope is always at the bottom of the stack (index 0).
+      - push_scope() creates a new local scope on top.
+      - pop_scope() removes the topmost local scope.
+      - set() writes to the current (topmost) scope by default.
+      - set() with global_=True writes to the global scope.
+      - get() searches from topmost scope down to global (lexical chain).
+      - delete() removes from the first scope where the var is found.
+    """
 
     def __init__(self):
-        self._vars: dict[str, Any] = {}
+        self._scopes: list[dict[str, Any]] = [{}]  # stack; [0] = global
         self._engine: Optional[SVTEngine] = None
 
     def bind_engine(self, engine: SVTEngine):
         self._engine = engine
 
-    def set(self, name: str, value: Any):
-        old = self._vars.get(name)
-        self._vars[name] = value
+    # ── Scope management ──────────────────────────────────────
+
+    def push_scope(self):
+        """Push a new local scope onto the stack."""
+        self._scopes.append({})
+
+    def pop_scope(self):
+        """Pop the topmost local scope. Global scope cannot be popped."""
+        if len(self._scopes) > 1:
+            self._scopes.pop()
+
+    @property
+    def scope_depth(self) -> int:
+        return len(self._scopes) - 1   # 0 = only global
+
+    # ── Core operations ───────────────────────────────────────
+
+    def set(self, name: str, value: Any, global_: bool = False):
+        old = self.get(name)
+        if global_:
+            self._scopes[0][name] = value
+        else:
+            # If var already exists in an outer scope, update it there
+            # (unless it also exists in the current scope).
+            target = self._scopes[-1]
+            if name not in target:
+                for scope in reversed(self._scopes[:-1]):
+                    if name in scope:
+                        target = scope
+                        break
+            target[name] = value
+        if self._engine:
+            self._engine.emit_event("var.changed", {"name": name, "old": old, "new": value})
+            self._engine.emit_event(f"var.changed.{name}", {"old": old, "new": value})
+
+    def set_local(self, name: str, value: Any):
+        """Always write to the current (topmost) scope."""
+        old = self.get(name)
+        self._scopes[-1][name] = value
         if self._engine:
             self._engine.emit_event("var.changed", {"name": name, "old": old, "new": value})
             self._engine.emit_event(f"var.changed.{name}", {"old": old, "new": value})
 
     def get(self, name: str, default: Any = None) -> Any:
-        return self._vars.get(name, default)
+        # Search from topmost scope down
+        for scope in reversed(self._scopes):
+            if name in scope:
+                return scope[name]
+        return default
 
     def delete(self, name: str) -> bool:
-        if name in self._vars:
-            old = self._vars.pop(name)
-            if self._engine:
-                self._engine.emit_event("var.deleted", {"name": name, "value": old})
-            return True
+        for scope in reversed(self._scopes):
+            if name in scope:
+                old = scope.pop(name)
+                if self._engine:
+                    self._engine.emit_event("var.deleted", {"name": name, "value": old})
+                return True
         return False
 
     def exists(self, name: str) -> bool:
-        return name in self._vars
+        for scope in reversed(self._scopes):
+            if name in scope:
+                return True
+        return False
 
     def list_all(self) -> dict[str, Any]:
-        return dict(self._vars)
+        """Return merged view (topmost wins)."""
+        merged = {}
+        for scope in self._scopes:
+            merged.update(scope)
+        return merged
+
+    def list_scope(self, depth: int = -1) -> dict[str, Any]:
+        """Return variables in a specific scope depth (-1 = current)."""
+        idx = depth if depth >= 0 else len(self._scopes) - 1
+        if 0 <= idx < len(self._scopes):
+            return dict(self._scopes[idx])
+        return {}
 
     def clear(self):
-        self._vars.clear()
+        self._scopes = [{}]
 
 
 class EventBus:
@@ -53,7 +118,6 @@ class EventBus:
         self._next_id: int = 1
 
     def on(self, event: str, handler: str, once: bool = False) -> int:
-        """Register a handler (SVT command string) for an event. Returns listener ID."""
         if event not in self._listeners:
             self._listeners[event] = []
         lid = self._next_id
@@ -66,7 +130,6 @@ class EventBus:
         return lid
 
     def off(self, listener_id: int) -> bool:
-        """Remove a listener by ID."""
         for event, listeners in self._listeners.items():
             for i, listener in enumerate(listeners):
                 if listener["id"] == listener_id:
@@ -75,13 +138,11 @@ class EventBus:
         return False
 
     def off_event(self, event: str) -> int:
-        """Remove all listeners for an event. Returns count removed."""
         count = len(self._listeners.get(event, []))
         self._listeners.pop(event, None)
         return count
 
     def emit(self, event: str, data: Any = None) -> list[str]:
-        """Emit an event, returning list of handler commands to execute."""
         handlers = []
         to_remove = []
         for listener in self._listeners.get(event, []):
@@ -93,7 +154,6 @@ class EventBus:
         return handlers
 
     def list_events(self) -> dict[str, int]:
-        """Return dict of event -> listener count."""
         return {e: len(ls) for e, ls in self._listeners.items() if ls}
 
     def list_listeners(self, event: str) -> list[dict]:
@@ -110,12 +170,10 @@ class ExecutionContext:
         self.args: list = args or []
         self.options: dict = options or {}
         self.raw: str = raw
-        self.block: Optional[Any] = None  # Set for block commands
+        self.block: Optional[Any] = None
 
     def execute(self, command_str: str) -> Any:
-        """Execute an SVT command string and return the result."""
         return self.engine.execute_line(command_str)
 
     def execute_lines(self, lines: list[str]) -> Any:
-        """Execute multiple SVT command lines sequentially."""
         return self.engine.execute_lines(lines)

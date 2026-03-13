@@ -6,7 +6,8 @@ import sys
 from typing import Optional, Any
 
 from svt.sdk.types import (
-    CommandResult, CommandResultStatus, ParsedCommand, BlockData, AppManifest
+    CommandResult, CommandResultStatus, ParsedCommand, BlockData, AppManifest,
+    SVTException,
 )
 from svt.sdk.context import VariableStore, EventBus, ExecutionContext
 from svt.sdk.base import SVTApp
@@ -15,15 +16,15 @@ from svt.core.loader import AppLoader
 
 
 # Block-starting command identifiers
-BLOCK_STARTERS = {"flow:if", "flow:while", "flow:for"}
-BLOCK_MIDDLES = {"flow:elif", "flow:else"}
+BLOCK_STARTERS = {"flow:if", "flow:while", "flow:for", "flow:try"}
+BLOCK_MIDDLES = {"flow:elif", "flow:else", "flow:catch", "flow:finally"}
 BLOCK_END = "flow:end"
 
 
 class SVTEngine:
     """The main SVT execution engine."""
 
-    VERSION = "1.0.0"
+    VERSION = "1.1.0"
 
     def __init__(self, base_path: str = None):
         self.base_path = base_path or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,10 +35,7 @@ class SVTEngine:
         self.running = False
         self._event_processing = False
 
-        # Bind variable store to engine for events
         self.variables.bind_engine(self)
-
-        # Loader
         self.loader = AppLoader(self)
 
     def init(self):
@@ -45,14 +43,12 @@ class SVTEngine:
         apps_dir = os.path.join(self.base_path, "apps")
         self.loader.add_apps_dir(apps_dir)
 
-        # Also check for user apps directory
         user_apps_dir = os.path.expanduser("~/.svt/apps")
         if os.path.isdir(user_apps_dir):
             self.loader.add_apps_dir(user_apps_dir)
 
         self.apps = self.loader.discover_all()
 
-        # Initialize apps
         ctx = self._make_context()
         for app in self.apps.values():
             try:
@@ -60,7 +56,6 @@ class SVTEngine:
             except Exception as e:
                 print(f"[SVT] Error initializing app '{app.name}': {e}")
 
-        # Set default variables
         self.variables.set("SVT_VERSION", self.VERSION)
         self.variables.set("SVT_PATH", self.base_path)
 
@@ -73,9 +68,8 @@ class SVTEngine:
         )
 
     def emit_event(self, event: str, data: Any = None):
-        """Emit an event and execute all registered handlers."""
         if self._event_processing:
-            return  # Prevent recursive event loops
+            return
         handlers = self.events.emit(event, data)
         if handlers:
             self._event_processing = True
@@ -88,19 +82,16 @@ class SVTEngine:
     # ── Execution ──────────────────────────────────────────────────
 
     def execute_line(self, line: str) -> Optional[CommandResult]:
-        """Execute a single SVT command line."""
         line = line.strip()
         if not line or line.startswith('#'):
             return None
-
         parsed = self.interpreter.parse(line)
         if not parsed:
             return None
-
         return self._dispatch(parsed)
 
     def execute_lines(self, lines: list[str]) -> Optional[CommandResult]:
-        """Execute multiple lines, handling blocks."""
+        """Execute multiple lines, handling blocks. SVTException propagates up."""
         last_result = None
         i = 0
         while i < len(lines):
@@ -110,7 +101,6 @@ class SVTEngine:
                 i += 1
                 continue
 
-            # Check for block-starting commands
             cmd_id = self._get_command_id(line)
             if cmd_id in BLOCK_STARTERS:
                 block, end_idx = self._collect_block(lines, i)
@@ -132,24 +122,25 @@ class SVTEngine:
         return last_result
 
     def _get_command_id(self, line: str) -> str:
-        """Extract app:command identifier from a line."""
         token = line.split()[0] if line.split() else ""
         return token
 
+    # ── Block Collection ───────────────────────────────────────
+
     def _collect_block(self, lines: list[str], start: int) -> tuple[Optional[BlockData], int]:
-        """Collect a flow control block from lines starting at index start."""
         first_line = lines[start].strip()
         parts = first_line.split(None, 1)
         cmd_id = parts[0]
         rest = parts[1] if len(parts) > 1 else ""
 
-        # Determine block type
         if cmd_id == "flow:if":
             return self._collect_if_block(lines, start, rest)
         elif cmd_id == "flow:while":
             return self._collect_simple_block(lines, start, "while", rest)
         elif cmd_id == "flow:for":
             return self._collect_simple_block(lines, start, "for", rest)
+        elif cmd_id == "flow:try":
+            return self._collect_try_block(lines, start)
         return None, start
 
     def _collect_if_block(self, lines: list[str], start: int, condition: str) -> tuple[BlockData, int]:
@@ -168,11 +159,9 @@ class SVTEngine:
             elif cmd_id == BLOCK_END:
                 depth -= 1
                 if depth == 0:
-                    # Assign whatever we've been collecting
                     if not block.body and not block.elif_branches:
                         block.body = current_body
                     elif block.elif_branches:
-                        # Assign to last elif or else
                         block.elif_branches[-1] = (block.elif_branches[-1][0], current_body)
                     else:
                         block.else_body = current_body
@@ -196,18 +185,14 @@ class SVTEngine:
                     last = block.elif_branches[-1]
                     if last[1] is None:
                         block.elif_branches[-1] = (last[0], current_body)
-                    else:
-                        pass  # already assigned
                 elif not block.body:
                     block.body = current_body
                 current_body = []
-                # Mark that we're in else (we'll collect into else_body)
-                block.else_body = []  # placeholder
+                block.else_body = []
             else:
                 current_body.append(lines[i])
             i += 1
 
-        # Unterminated block
         if not block.body:
             block.body = current_body
         return block, i - 1
@@ -216,7 +201,6 @@ class SVTEngine:
         block = BlockData(block_type=btype)
 
         if btype == "for":
-            # Parse: var in expr
             for_parts = rest.split(None, 2)
             if len(for_parts) >= 3 and for_parts[1] == "in":
                 block.iterator_var = for_parts[0]
@@ -249,8 +233,61 @@ class SVTEngine:
         block.body = body
         return block, i - 1
 
+    def _collect_try_block(self, lines: list[str], start: int) -> tuple[BlockData, int]:
+        """Collect flow:try / flow:catch [varname] / flow:finally / flow:end."""
+        block = BlockData(block_type="try")
+        section = "body"      # body -> catch -> finally
+        current = []
+        depth = 1
+        i = start + 1
+
+        while i < len(lines):
+            line = lines[i].strip()
+            cmd_id = self._get_command_id(line)
+
+            if cmd_id in BLOCK_STARTERS:
+                depth += 1
+                current.append(lines[i])
+            elif cmd_id == BLOCK_END:
+                depth -= 1
+                if depth == 0:
+                    if section == "body":
+                        block.body = current
+                    elif section == "catch":
+                        block.catch_body = current
+                    elif section == "finally":
+                        block.finally_body = current
+                    return block, i
+                current.append(lines[i])
+            elif cmd_id == "flow:catch" and depth == 1:
+                if section == "body":
+                    block.body = current
+                # Parse optional variable name: flow:catch e
+                parts = line.split(None, 1)
+                block.catch_var = parts[1].strip() if len(parts) > 1 else "_err"
+                section = "catch"
+                current = []
+            elif cmd_id == "flow:finally" and depth == 1:
+                if section == "body":
+                    block.body = current
+                elif section == "catch":
+                    block.catch_body = current
+                section = "finally"
+                current = []
+            else:
+                current.append(lines[i])
+            i += 1
+
+        # Unterminated
+        if section == "body":
+            block.body = current
+        elif section == "catch":
+            block.catch_body = current
+        elif section == "finally":
+            block.finally_body = current
+        return block, i - 1
+
     def _execute_block(self, block: BlockData) -> Optional[CommandResult]:
-        """Delegate block execution to the flow app."""
         flow_app = self.apps.get("flow")
         if not flow_app:
             return CommandResult.error("Flow app not loaded - cannot execute block commands")
@@ -262,7 +299,6 @@ class SVTEngine:
     # ── Command Dispatch ───────────────────────────────────────────
 
     def _dispatch(self, parsed: ParsedCommand) -> CommandResult:
-        """Dispatch a parsed command to the appropriate app."""
         app_name = parsed.app
         cmd_name = parsed.command
 
@@ -271,7 +307,6 @@ class SVTEngine:
             return CommandResult.error(f"Unknown app: '{app_name}'")
 
         if cmd_name and cmd_name not in app.manifest.commands:
-            # Try fallback
             handler = getattr(app, f"cmd_{cmd_name}", None)
             if handler is None:
                 return CommandResult.error(
@@ -289,7 +324,6 @@ class SVTEngine:
     # ── REPL ───────────────────────────────────────────────────────
 
     def repl(self):
-        """Start the interactive Read-Eval-Print Loop."""
         self.running = True
         print(f"SVT Terminal v{self.VERSION}")
         print("Type 'sys:help' for help, 'sys:exit' to quit.\n")
@@ -305,26 +339,29 @@ class SVTEngine:
             if not line.strip():
                 continue
 
-            # Check for multi-line block input
-            cmd_id = self._get_command_id(line.strip())
-            if cmd_id in BLOCK_STARTERS:
-                block_lines = [line]
-                depth = 1
-                while depth > 0:
-                    try:
-                        cont = input("... ")
-                    except (EOFError, KeyboardInterrupt):
-                        print()
-                        break
-                    block_lines.append(cont)
-                    cid = self._get_command_id(cont.strip())
-                    if cid in BLOCK_STARTERS:
-                        depth += 1
-                    elif cid == BLOCK_END:
-                        depth -= 1
-                result = self.execute_lines(block_lines)
-            else:
-                result = self.execute_line(line)
+            try:
+                cmd_id = self._get_command_id(line.strip())
+                if cmd_id in BLOCK_STARTERS:
+                    block_lines = [line]
+                    depth = 1
+                    while depth > 0:
+                        try:
+                            cont = input("... ")
+                        except (EOFError, KeyboardInterrupt):
+                            print()
+                            break
+                        block_lines.append(cont)
+                        cid = self._get_command_id(cont.strip())
+                        if cid in BLOCK_STARTERS:
+                            depth += 1
+                        elif cid == BLOCK_END:
+                            depth -= 1
+                    result = self.execute_lines(block_lines)
+                else:
+                    result = self.execute_line(line)
+            except SVTException as e:
+                print(f"[uncaught exception] {e.svt_message}")
+                result = None
 
             if result:
                 if result.status == CommandResultStatus.EXIT:
@@ -336,22 +373,21 @@ class SVTEngine:
                     print(result.message)
 
     def run_script(self, filepath: str) -> Optional[CommandResult]:
-        """Execute an SVT script file."""
         if not os.path.isfile(filepath):
             return CommandResult.error(f"Script not found: {filepath}")
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
             lines = [l.rstrip('\n') for l in lines]
-            # Skip shebang
             if lines and lines[0].startswith('#!'):
                 lines = lines[1:]
             return self.execute_lines(lines)
+        except SVTException as e:
+            return CommandResult.error(f"Uncaught exception: {e.svt_message}")
         except Exception as e:
             return CommandResult.error(f"Script error: {e}")
 
     def shutdown(self):
-        """Clean shutdown: unload all apps."""
         for app in self.apps.values():
             try:
                 app.on_unload()
