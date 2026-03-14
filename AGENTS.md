@@ -15,7 +15,7 @@ All commands are apps in `apps/`. Engine is a thin parser+dispatcher. SDK bridge
 | `docs/architecture.md` | Deep dive into engine, interpreter, loader, SDK internals |
 | `docs/app-development.md` | How to create new apps (Python and Script types) |
 | `docs/data-structures.md` | Every data structure, file format, grammar specification |
-| `docs/command-reference.md` | Complete reference for all 105 built-in commands |
+| `docs/command-reference.md` | Complete reference for all 248 built-in commands |
 
 ## The One Rule
 
@@ -46,6 +46,6 @@ from svt.sdk import SVTException  # For throwable errors
 
 ## Project Stats
 
-- 8 apps, 105 commands, ~1,871 lines of Python
+- 14 apps, 248 commands, ~1,871+ lines of Python
 - Python 3.10+, stdlib only, no external dependencies
 - Apps discovered at startup from `svt/apps/` and `~/.svt/apps/`

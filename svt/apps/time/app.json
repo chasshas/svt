@@ -1,0 +1,131 @@
+{
+    "name": "time",
+    "version": "1.1.1",
+    "type": "python",
+    "description": "Date and time utilities wrapping Python's datetime and time modules",
+    "module": "app",
+    "commands": {
+        "now": {
+            "description": "Return current local datetime as an ISO string",
+            "options": {
+                "utc":  {"type": "bool",   "description": "Use UTC instead of local time"},
+                "ts":   {"type": "bool",   "description": "Return Unix timestamp (float) instead"},
+                "fmt":  {"type": "string", "description": "strftime format string"}
+            }
+        },
+        "today": {
+            "description": "Return today's date as YYYY-MM-DD",
+            "options": {
+                "utc": {"type": "bool", "description": "Use UTC date"}
+            }
+        },
+        "timestamp": {
+            "description": "Return current Unix timestamp (seconds since epoch)",
+            "options": {
+                "ms": {"type": "bool", "description": "Return milliseconds instead of seconds"}
+            }
+        },
+        "from_timestamp": {
+            "description": "Convert a Unix timestamp to a datetime dict",
+            "args": [{"name": "ts", "type": "float"}],
+            "options": {
+                "utc": {"type": "bool",   "description": "Interpret as UTC"},
+                "fmt": {"type": "string", "description": "Return formatted string instead of dict"}
+            }
+        },
+        "parse": {
+            "description": "Parse a datetime string into a datetime dict",
+            "args": [{"name": "s", "type": "string"}],
+            "options": {
+                "fmt": {"type": "string", "description": "strptime format (default: auto-detect ISO)"}
+            }
+        },
+        "format": {
+            "description": "Format a datetime dict (from parse/now) into a string",
+            "args": [{"name": "dt"}, {"name": "fmt", "optional": true}],
+            "options": {
+                "fmt": {"type": "string", "description": "strftime format (default: ISO 8601)"}
+            }
+        },
+        "add": {
+            "description": "Add a duration to a datetime dict, return new datetime dict",
+            "args": [{"name": "dt"}],
+            "options": {
+                "days":    {"type": "int",   "description": "Days to add"},
+                "hours":   {"type": "int",   "description": "Hours to add"},
+                "minutes": {"type": "int",   "description": "Minutes to add"},
+                "seconds": {"type": "int",   "description": "Seconds to add"},
+                "weeks":   {"type": "int",   "description": "Weeks to add"}
+            }
+        },
+        "sub": {
+            "description": "Subtract a duration from a datetime dict, return new datetime dict",
+            "args": [{"name": "dt"}],
+            "options": {
+                "days":    {"type": "int", "description": "Days to subtract"},
+                "hours":   {"type": "int", "description": "Hours to subtract"},
+                "minutes": {"type": "int", "description": "Minutes to subtract"},
+                "seconds": {"type": "int", "description": "Seconds to subtract"},
+                "weeks":   {"type": "int", "description": "Weeks to subtract"}
+            }
+        },
+        "diff": {
+            "description": "Difference between two datetime dicts, return a duration dict",
+            "args": [{"name": "dt1"}, {"name": "dt2"}]
+        },
+        "year":    { "description": "Extract the year from a datetime dict",        "args": [{"name": "dt"}] },
+        "month":   { "description": "Extract the month from a datetime dict",       "args": [{"name": "dt"}] },
+        "day":     { "description": "Extract the day from a datetime dict",         "args": [{"name": "dt"}] },
+        "hour":    { "description": "Extract the hour from a datetime dict",        "args": [{"name": "dt"}] },
+        "minute":  { "description": "Extract the minute from a datetime dict",      "args": [{"name": "dt"}] },
+        "second":  { "description": "Extract the second from a datetime dict",      "args": [{"name": "dt"}] },
+        "weekday": { "description": "Return weekday number (0=Mon … 6=Sun)",        "args": [{"name": "dt"}] },
+        "weekday_name": { "description": "Return weekday name (Monday … Sunday)",   "args": [{"name": "dt"}] },
+        "month_name":   { "description": "Return month name (January … December)", "args": [{"name": "dt"}] },
+        "is_leap": { "description": "Return true if the year in dt (or given year) is a leap year", "args": [{"name": "dt_or_year"}] },
+        "days_in_month": { "description": "Return number of days in the month of a datetime dict", "args": [{"name": "dt"}] },
+        "to_timestamp": {
+            "description": "Convert a datetime dict to a Unix timestamp",
+            "args": [{"name": "dt"}]
+        },
+        "to_iso": {
+            "description": "Convert a datetime dict to an ISO 8601 string",
+            "args": [{"name": "dt"}]
+        },
+        "sleep": {
+            "description": "Pause execution for N seconds",
+            "args": [{"name": "seconds", "type": "float"}]
+        },
+        "perf": {
+            "description": "Return a high-resolution performance counter value (for timing)",
+            "options": {
+                "ns": {"type": "bool", "description": "Return nanoseconds instead of seconds"}
+            }
+        },
+        "make": {
+            "description": "Build a datetime dict from components",
+            "options": {
+                "year":   {"type": "int", "description": "Year  (default: current)"},
+                "month":  {"type": "int", "description": "Month (default: current)"},
+                "day":    {"type": "int", "description": "Day   (default: current)"},
+                "hour":   {"type": "int", "description": "Hour  (default: 0)"},
+                "minute": {"type": "int", "description": "Minute (default: 0)"},
+                "second": {"type": "int", "description": "Second (default: 0)"}
+            }
+        },
+        "compare": {
+            "description": "Compare two datetimes: returns -1, 0, or 1 (before, equal, after)",
+            "args": [{"name": "dt1"}, {"name": "dt2"}]
+        },
+        "between": {
+            "description": "Return true if dt is between start and end (inclusive)",
+            "args": [{"name": "dt"}, {"name": "start"}, {"name": "end"}]
+        },
+        "timezone": {
+            "description": "Return the local timezone name",
+            "options": {
+                "offset": {"type": "bool", "description": "Return UTC offset in seconds instead"}
+            }
+        }
+    }
+}

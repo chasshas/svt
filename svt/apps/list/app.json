@@ -1,0 +1,61 @@
+{
+    "name": "list",
+    "version": "1.1.1",
+    "type": "python",
+    "description": "List utilities mirroring Python's list methods",
+    "module": "app",
+    "commands": {
+        "new":     { "description": "Create a new list from arguments",             "args": [{"name": "items", "optional": true}] },
+        "push":    { "description": "Append an item to the end, return new list",   "args": [{"name": "lst"}, {"name": "item"}] },
+        "pop": {
+            "description": "Remove and return the last item (or item at index)",
+            "args": [{"name": "lst"}],
+            "options": {
+                "i": {"type": "int", "description": "Index to pop (default: last)"}
+            }
+        },
+        "get":    { "description": "Get item at index (negative index supported)", "args": [{"name": "lst"}, {"name": "index"}] },
+        "set":    { "description": "Return a new list with item at index replaced","args": [{"name": "lst"}, {"name": "index"}, {"name": "value"}] },
+        "del":    { "description": "Return a new list with item at index removed", "args": [{"name": "lst"}, {"name": "index"}] },
+        "len":    { "description": "Return the number of items in the list",       "args": [{"name": "lst"}] },
+        "sort": {
+            "description": "Return a sorted copy of the list",
+            "args": [{"name": "lst"}],
+            "options": {
+                "r":   {"type": "bool",   "description": "Reverse sort order"},
+                "key": {"type": "string", "description": "Attribute/key to sort by (for list of dicts)"}
+            }
+        },
+        "reverse":  { "description": "Return a reversed copy of the list",        "args": [{"name": "lst"}] },
+        "slice":    { "description": "Return lst[start:end:step]",                 "args": [{"name": "lst"}, {"name": "start"}, {"name": "end", "optional": true}, {"name": "step", "optional": true}] },
+        "contains": { "description": "Return true if item is in the list",        "args": [{"name": "lst"}, {"name": "item"}] },
+        "index":    { "description": "Return index of first occurrence, or -1",   "args": [{"name": "lst"}, {"name": "item"}] },
+        "count":    { "description": "Count occurrences of item in list",         "args": [{"name": "lst"}, {"name": "item"}] },
+        "insert":   { "description": "Return new list with item inserted at index","args": [{"name": "lst"}, {"name": "index"}, {"name": "item"}] },
+        "extend":   { "description": "Concatenate two lists",                     "args": [{"name": "lst1"}, {"name": "lst2"}] },
+        "flatten":  { "description": "Flatten one level of nested lists",         "args": [{"name": "lst"}] },
+        "unique":   { "description": "Remove duplicates, preserving order",       "args": [{"name": "lst"}] },
+        "join":     { "description": "Join list items into a string",             "args": [{"name": "lst"}, {"name": "sep", "optional": true}] },
+        "head": {
+            "description": "Return first N items (default 1)",
+            "args": [{"name": "lst"}, {"name": "n", "optional": true}]
+        },
+        "tail": {
+            "description": "Return last N items (default 1)",
+            "args": [{"name": "lst"}, {"name": "n", "optional": true}]
+        },
+        "zip":     { "description": "Zip two lists into a list of [a, b] pairs",  "args": [{"name": "lst1"}, {"name": "lst2"}] },
+        "sum":     { "description": "Sum all numeric items",                      "args": [{"name": "lst"}] },
+        "min":     { "description": "Return the minimum value",                   "args": [{"name": "lst"}] },
+        "max":     { "description": "Return the maximum value",                   "args": [{"name": "lst"}] },
+        "avg":     { "description": "Return the average of numeric items",        "args": [{"name": "lst"}] },
+        "filter":  { "description": "Keep items matching a regex pattern (strings only)", "args": [{"name": "lst"}, {"name": "pattern"}] },
+        "map_str": {
+            "description": "Apply a str: operation to every item (e.g. upper, lower, strip)",
+            "args": [{"name": "lst"}, {"name": "op"}]
+        },
+        "range":   { "description": "Generate a list of numbers from start to end (inclusive)", "args": [{"name": "start"}, {"name": "end"}, {"name": "step", "optional": true}] },
+        "sample":  { "description": "Return N random items from the list",        "args": [{"name": "lst"}, {"name": "n", "optional": true}] },
+        "shuffle": { "description": "Return a randomly shuffled copy of the list","args": [{"name": "lst"}] }
+    }
+}

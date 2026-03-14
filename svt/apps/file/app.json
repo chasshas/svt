@@ -1,0 +1,144 @@
+{
+    "name": "file",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "File system utilities: read, write, copy, move, delete, search, stat",
+    "module": "app",
+    "commands": {
+        "read": {
+            "description": "Read a file and return its contents",
+            "args": [{"name": "path", "type": "string"}],
+            "options": {
+                "lines": {"type": "bool",   "description": "Return contents as a list of lines"},
+                "n":     {"type": "int",    "description": "Read only the first N lines"},
+                "tail":  {"type": "int",    "description": "Read only the last N lines"},
+                "enc":   {"type": "string", "description": "Encoding (default utf-8)"}
+            }
+        },
+        "write": {
+            "description": "Write text to a file (overwrites by default)",
+            "args": [{"name": "path", "type": "string"}, {"name": "content", "type": "string"}],
+            "options": {
+                "append": {"type": "bool",   "description": "Append instead of overwrite"},
+                "enc":    {"type": "string", "description": "Encoding (default utf-8)"}
+            }
+        },
+        "append": {
+            "description": "Append text to a file (shorthand for file:write --append)",
+            "args": [{"name": "path", "type": "string"}, {"name": "content", "type": "string"}]
+        },
+        "copy": {
+            "description": "Copy a file or directory",
+            "args": [{"name": "src", "type": "string"}, {"name": "dst", "type": "string"}],
+            "options": {
+                "r": {"type": "bool", "description": "Recursive (copy directory tree)"}
+            }
+        },
+        "move": {
+            "description": "Move (rename) a file or directory",
+            "args": [{"name": "src", "type": "string"}, {"name": "dst", "type": "string"}]
+        },
+        "rm": {
+            "description": "Remove a file or directory",
+            "args": [{"name": "path", "type": "string"}],
+            "options": {
+                "r": {"type": "bool", "description": "Recursive — remove directory and contents"},
+                "f": {"type": "bool", "description": "Force — ignore missing files"}
+            }
+        },
+        "mkdir": {
+            "description": "Create a directory (and parents)",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "ls": {
+            "description": "List directory contents, returns list of names",
+            "args": [{"name": "path", "type": "string", "optional": true}],
+            "options": {
+                "a": {"type": "bool",   "description": "Include hidden files (dot-files)"},
+                "l": {"type": "bool",   "description": "Long format — show size, mtime, type"},
+                "r": {"type": "bool",   "description": "Recursive listing"}
+            }
+        },
+        "exists": {
+            "description": "Return true if path exists, false otherwise",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "isfile": {
+            "description": "Return true if path is a regular file",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "isdir": {
+            "description": "Return true if path is a directory",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "stat": {
+            "description": "Return file metadata as an object (size, mtime, ctime, mode)",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "size": {
+            "description": "Return file size in bytes",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "ext": {
+            "description": "Return the file extension (e.g. .py)",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "basename": {
+            "description": "Return the filename portion of a path",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "dirname": {
+            "description": "Return the directory portion of a path",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "abspath": {
+            "description": "Return the absolute path",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "join": {
+            "description": "Join path components",
+            "args": [{"name": "parts", "type": "string"}]
+        },
+        "find": {
+            "description": "Find files matching a glob pattern under a root directory",
+            "args": [
+                {"name": "root",    "type": "string"},
+                {"name": "pattern", "type": "string"}
+            ],
+            "options": {
+                "type": {"type": "string", "description": "f=files only, d=dirs only (default: both)"}
+            }
+        },
+        "grep": {
+            "description": "Search for a regex pattern in a file, returns matching lines",
+            "args": [
+                {"name": "pattern", "type": "string"},
+                {"name": "path",    "type": "string"}
+            ],
+            "options": {
+                "i":   {"type": "bool", "description": "Case-insensitive"},
+                "n":   {"type": "bool", "description": "Prefix matches with line numbers"},
+                "r":   {"type": "bool", "description": "Recurse into directories"}
+            }
+        },
+        "lines": {
+            "description": "Return the number of lines in a file",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "touch": {
+            "description": "Create an empty file or update its mtime",
+            "args": [{"name": "path", "type": "string"}]
+        },
+        "tempdir": {
+            "description": "Create a temporary directory and return its path",
+            "args": []
+        },
+        "tempfile": {
+            "description": "Create a temporary file and return its path",
+            "args": [],
+            "options": {
+                "suffix": {"type": "string", "description": "File suffix (e.g. .txt)"}
+            }
+        }
+    }
+}

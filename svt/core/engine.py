@@ -24,7 +24,7 @@ BLOCK_END = "flow:end"
 class SVTEngine:
     """The main SVT execution engine."""
 
-    VERSION = "1.1.0"
+    VERSION = "1.1.1"
 
     def __init__(self, base_path: str = None):
         self.base_path = base_path or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

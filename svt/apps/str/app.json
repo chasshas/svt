@@ -1,0 +1,103 @@
+{
+    "name": "str",
+    "version": "1.1.1",
+    "type": "python",
+    "description": "String utilities mirroring Python's str methods",
+    "module": "app",
+    "commands": {
+        "upper":      { "description": "Convert to uppercase",                     "args": [{"name": "s"}] },
+        "lower":      { "description": "Convert to lowercase",                     "args": [{"name": "s"}] },
+        "title":      { "description": "Convert to title case",                    "args": [{"name": "s"}] },
+        "capitalize": { "description": "Capitalize first character",               "args": [{"name": "s"}] },
+        "swapcase":   { "description": "Swap upper/lower case",                    "args": [{"name": "s"}] },
+        "strip": {
+            "description": "Strip leading and trailing whitespace (or chars)",
+            "args": [{"name": "s"}],
+            "options": {
+                "chars": {"type": "string", "description": "Characters to strip instead of whitespace"},
+                "left":  {"type": "bool",   "description": "Strip left side only"},
+                "right": {"type": "bool",   "description": "Strip right side only"}
+            }
+        },
+        "split": {
+            "description": "Split string into a list",
+            "args": [{"name": "s"}],
+            "options": {
+                "sep":   {"type": "string", "description": "Separator (default: whitespace)"},
+                "n":     {"type": "int",    "description": "Max splits"}
+            }
+        },
+        "join": {
+            "description": "Join a list into a string with a separator",
+            "args": [{"name": "sep"}, {"name": "items"}]
+        },
+        "replace": {
+            "description": "Replace occurrences of old with new",
+            "args": [{"name": "s"}, {"name": "old"}, {"name": "new"}],
+            "options": {
+                "n": {"type": "int", "description": "Max replacements (default: all)"}
+            }
+        },
+        "find": {
+            "description": "Return index of first occurrence of sub, or -1",
+            "args": [{"name": "s"}, {"name": "sub"}],
+            "options": {
+                "r": {"type": "bool", "description": "Search from the right (rfind)"}
+            }
+        },
+        "contains":   { "description": "Return true if sub is in s",              "args": [{"name": "s"}, {"name": "sub"}] },
+        "startswith": { "description": "Return true if s starts with prefix",     "args": [{"name": "s"}, {"name": "prefix"}] },
+        "endswith":   { "description": "Return true if s ends with suffix",       "args": [{"name": "s"}, {"name": "suffix"}] },
+        "len":        { "description": "Return the length of a string",           "args": [{"name": "s"}] },
+        "slice": {
+            "description": "Return a substring s[start:end]",
+            "args": [{"name": "s"}, {"name": "start"}, {"name": "end", "optional": true}]
+        },
+        "count":  { "description": "Count non-overlapping occurrences of sub",   "args": [{"name": "s"}, {"name": "sub"}] },
+        "repeat": { "description": "Repeat string n times",                      "args": [{"name": "s"}, {"name": "n"}] },
+        "reverse":{ "description": "Reverse the string",                         "args": [{"name": "s"}] },
+        "pad": {
+            "description": "Pad string to width (default right-pads with spaces)",
+            "args": [{"name": "s"}, {"name": "width"}],
+            "options": {
+                "left":  {"type": "bool",   "description": "Left-pad (right-align)"},
+                "char":  {"type": "string", "description": "Pad character (default space)"},
+                "center":{"type": "bool",   "description": "Center-align"}
+            }
+        },
+        "chars":   { "description": "Split string into a list of characters",    "args": [{"name": "s"}] },
+        "lines":   { "description": "Split string into a list of lines",         "args": [{"name": "s"}] },
+        "format": {
+            "description": "Format a template string using positional args ($0, $1, ...) or named keys",
+            "args": [{"name": "template"}]
+        },
+        "isdigit":  { "description": "Return true if all chars are digits",      "args": [{"name": "s"}] },
+        "isalpha":  { "description": "Return true if all chars are alphabetic",  "args": [{"name": "s"}] },
+        "isalnum":  { "description": "Return true if all chars are alphanumeric","args": [{"name": "s"}] },
+        "isspace":  { "description": "Return true if all chars are whitespace",  "args": [{"name": "s"}] },
+        "isupper":  { "description": "Return true if string is all uppercase",   "args": [{"name": "s"}] },
+        "islower":  { "description": "Return true if string is all lowercase",   "args": [{"name": "s"}] },
+        "sub": {
+            "description": "Regex substitution: replace pattern with repl in s",
+            "args": [{"name": "s"}, {"name": "pattern"}, {"name": "repl"}],
+            "options": {
+                "i": {"type": "bool", "description": "Case-insensitive"},
+                "n": {"type": "int",  "description": "Max replacements (default: all)"}
+            }
+        },
+        "match": {
+            "description": "Return true if regex pattern matches anywhere in s",
+            "args": [{"name": "s"}, {"name": "pattern"}],
+            "options": {
+                "i": {"type": "bool", "description": "Case-insensitive"}
+            }
+        },
+        "extract": {
+            "description": "Return all regex capture groups (or full matches) as a list",
+            "args": [{"name": "s"}, {"name": "pattern"}],
+            "options": {
+                "i": {"type": "bool", "description": "Case-insensitive"}
+            }
+        }
+    }
+}

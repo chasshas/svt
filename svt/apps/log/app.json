@@ -1,0 +1,90 @@
+{
+    "name": "log",
+    "version": "1.1.1",
+    "type": "python",
+    "description": "Structured logging with levels, handlers, formatters, and history — mirrors Python's logging module",
+    "module": "app",
+    "commands": {
+        "debug":    { "description": "Emit a DEBUG message",    "args": [{"name": "message"}] },
+        "info":     { "description": "Emit an INFO message",    "args": [{"name": "message"}] },
+        "warning":  { "description": "Emit a WARNING message",  "args": [{"name": "message"}] },
+        "error":    { "description": "Emit an ERROR message",   "args": [{"name": "message"}] },
+        "critical": { "description": "Emit a CRITICAL message", "args": [{"name": "message"}] },
+        "log": {
+            "description": "Emit a message at an explicit level (DEBUG|INFO|WARNING|ERROR|CRITICAL)",
+            "args": [{"name": "level"}, {"name": "message"}]
+        },
+        "level": {
+            "description": "Get or set the minimum log level",
+            "args": [{"name": "level", "optional": true}]
+        },
+        "format": {
+            "description": "Get or set the log format string (tokens: %(asctime)s %(levelname)s %(name)s %(message)s)",
+            "args": [{"name": "fmt", "optional": true}]
+        },
+        "name": {
+            "description": "Get or set the logger name",
+            "args": [{"name": "name", "optional": true}]
+        },
+        "add_file": {
+            "description": "Add a file handler",
+            "args": [{"name": "path"}],
+            "options": {
+                "level":  {"type": "string", "description": "Minimum level for this handler (default: same as logger)"},
+                "fmt":    {"type": "string", "description": "Format string for this handler"},
+                "append": {"type": "bool",   "description": "Append to file instead of overwrite (default: append)"}
+            }
+        },
+        "remove_file": {
+            "description": "Remove a file handler by path",
+            "args": [{"name": "path"}]
+        },
+        "add_console": {
+            "description": "Add (or re-enable) a console handler",
+            "options": {
+                "level":  {"type": "string", "description": "Minimum level for this handler"},
+                "stderr": {"type": "bool",   "description": "Write to stderr instead of stdout (default: stderr)"},
+                "color":  {"type": "bool",   "description": "Enable ANSI color output (default: true)"}
+            }
+        },
+        "remove_console": {
+            "description": "Remove the console handler"
+        },
+        "handlers": {
+            "description": "List all active handlers"
+        },
+        "clear_handlers": {
+            "description": "Remove all handlers"
+        },
+        "history": {
+            "description": "Return the in-memory log history as a list of record dicts",
+            "options": {
+                "level": {"type": "string", "description": "Filter to records at or above this level"},
+                "n":     {"type": "int",    "description": "Limit to last N records"},
+                "name":  {"type": "string", "description": "Filter by logger name"}
+            }
+        },
+        "tail": {
+            "description": "Print the last N log records (default 10)",
+            "args": [{"name": "n", "optional": true}],
+            "options": {
+                "level": {"type": "string", "description": "Filter by minimum level"}
+            }
+        },
+        "clear_history": {
+            "description": "Clear the in-memory log history"
+        },
+        "enable": {
+            "description": "Re-enable logging after log:disable"
+        },
+        "disable": {
+            "description": "Disable all log output (records are still stored in history)"
+        },
+        "reset": {
+            "description": "Reset logger to defaults (INFO level, console handler, default format)"
+        },
+        "stats": {
+            "description": "Return a summary dict of log counts per level"
+        }
+    }
+}

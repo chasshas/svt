@@ -1,0 +1,90 @@
+{
+    "name": "net",
+    "version": "1.1.1",
+    "type": "python",
+    "description": "Networking utilities: HTTP requests, DNS, ping, port scan, IP info",
+    "module": "app",
+    "commands": {
+        "get": {
+            "description": "HTTP GET request, returns response body",
+            "args": [{"name": "url", "type": "string"}],
+            "options": {
+                "timeout": {"type": "int",    "description": "Timeout in seconds (default 10)"},
+                "headers": {"type": "bool",   "description": "Print response headers"},
+                "status":  {"type": "bool",   "description": "Return status code instead of body"},
+                "insecure":{"type": "bool",   "description": "Skip TLS certificate verification"}
+            }
+        },
+        "post": {
+            "description": "HTTP POST request with a JSON or form body, returns response body",
+            "args": [{"name": "url", "type": "string"}],
+            "options": {
+                "data":    {"type": "string", "description": "Body string (raw)"},
+                "json":    {"type": "string", "description": "JSON string body (sets Content-Type)"},
+                "timeout": {"type": "int",    "description": "Timeout in seconds (default 10)"},
+                "status":  {"type": "bool",   "description": "Return status code instead of body"},
+                "insecure":{"type": "bool",   "description": "Skip TLS certificate verification"}
+            }
+        },
+        "headers": {
+            "description": "Fetch only the HTTP response headers for a URL",
+            "args": [{"name": "url", "type": "string"}],
+            "options": {
+                "timeout": {"type": "int", "description": "Timeout in seconds (default 10)"}
+            }
+        },
+        "resolve": {
+            "description": "DNS resolve a hostname to its IP addresses",
+            "args": [{"name": "host", "type": "string"}]
+        },
+        "ping": {
+            "description": "ICMP ping a host (uses OS ping), returns avg round-trip time ms",
+            "args": [{"name": "host", "type": "string"}],
+            "options": {
+                "count": {"type": "int", "description": "Number of packets (default 4)"}
+            }
+        },
+        "scan": {
+            "description": "TCP port scan on a host",
+            "args": [{"name": "host", "type": "string"}],
+            "options": {
+                "ports":   {"type": "string", "description": "Port or range, e.g. 80 or 20-1024 (default 1-1024)"},
+                "timeout": {"type": "float",  "description": "Per-port timeout in seconds (default 0.5)"}
+            }
+        },
+        "ip": {
+            "description": "Show local and/or public IP address",
+            "options": {
+                "public": {"type": "bool", "description": "Fetch public (external) IP only"},
+                "local":  {"type": "bool", "description": "Show local interface IP only"}
+            }
+        },
+        "download": {
+            "description": "Download a URL to a local file",
+            "args": [
+                {"name": "url",  "type": "string"},
+                {"name": "dest", "type": "string"}
+            ],
+            "options": {
+                "timeout":  {"type": "int",  "description": "Timeout in seconds (default 30)"},
+                "insecure": {"type": "bool", "description": "Skip TLS certificate verification"}
+            }
+        },
+        "urlencode": {
+            "description": "URL-encode a string",
+            "args": [{"name": "text", "type": "string"}]
+        },
+        "urldecode": {
+            "description": "URL-decode a string",
+            "args": [{"name": "text", "type": "string"}]
+        },
+        "base64enc": {
+            "description": "Base64-encode a string",
+            "args": [{"name": "text", "type": "string"}]
+        },
+        "base64dec": {
+            "description": "Base64-decode a string",
+            "args": [{"name": "text", "type": "string"}]
+        }
+    }
+}

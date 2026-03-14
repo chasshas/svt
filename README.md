@@ -1,13 +1,13 @@
-# SVT v1.1 — Scriptable Virtual Terminal
+# SVT v1.1.1 — Scriptable Virtual Terminal
 
 순수 Python 플러그인 기반 터미널. 모든 기능이 `앱:커맨드` 형태의 독립 앱으로 존재합니다.
 
 ## 실행
 
 ```bash
-python -m svt                    # 인터랙티브 REPL
-python -m svt script.svt         # 스크립트 실행
-python -m svt -e "io:print Hi"   # 인라인 실행
+python -m main.py svt                    # 인터랙티브 REPL
+python -m main.py script.svt         # 스크립트 실행
+python -m main.py -e "io:print Hi"   # 인라인 실행
 ```
 
 ## 프로젝트 구조
@@ -17,12 +17,13 @@ svt/
 ├── main.py              # 진입점
 ├── core/                # 엔진 (파서, 디스패처, 블록 수집)
 ├── sdk/                 # 앱 개발용 SDK (ExecutionContext, VariableStore, EventBus)
-├── apps/                # 내장 앱 8개 (105개 커맨드)
+├── apps/                # 내장 앱 14개 (248개 커맨드)
 │   ├── sys/   var/   io/   flow/   exec/   event/   math/   shell/
+│   ├── str/   time/  log/  list/   map/    net/
 ├── docs/                # 상세 문서
 │   ├── architecture.md      # 아키텍처 심층 분석
 │   ├── app-development.md   # 앱 개발 가이드
-│   ├── command-reference.md # 전체 커맨드 레퍼런스 (105개)
+│   ├── command-reference.md # 전체 커맨드 레퍼런스 (248개)
 │   └── data-structures.md   # 자료구조 / 파일 형식
 ├── CLAUDE.md            # Claude Code 프로젝트 컨텍스트
 ├── AGENTS.md            # 범용 AI 에이전트 컨텍스트
@@ -109,7 +110,7 @@ var:set score 100                      # → "변경!"
 event:emit custom_event
 ```
 
-## 내장 앱 요약 (8개, 105개 커맨드)
+## 내장 앱 요약 (14개, 248개 커맨드)
 
 | 앱 | 수 | 설명 |
 |----|-----|------|
@@ -121,6 +122,12 @@ event:emit custom_event
 | event | 6 | on, once, off, emit, list, clear |
 | math | 41 | 산술, 삼각함수, 로그, 반올림, 상수, 난수, 변환 |
 | shell | 9 | exec, run, pipe, env, setenv, cd, pwd, which, exit_code |
+| str | 31 | upper/lower/title, strip, split, join, replace, find, contains, startswith/endswith, len, slice, count, repeat, reverse, pad, chars, lines, format, is*, sub/match/extract (regex) |
+| time | 28 | now, today, timestamp, parse, format, add/sub/diff, year/month/day/hour/minute/second, weekday, is_leap, sleep, perf, make, compare, between, timezone |
+| log | 22 | debug/info/warning/error/critical, log, level, format, name, add_file/remove_file, add/remove_console, handlers, history, tail, enable/disable, reset, stats |
+| list | 30 | new, push, pop, get, set, del, len, sort, reverse, slice, contains, index, count, insert, extend, flatten, unique, join, head, tail, zip, sum/min/max/avg, filter, map_str, range, sample, shuffle |
+| map | 20 | new, set, get, del, has, keys, values, items, len, merge, pop, select, omit, invert, from_pairs, from_lists, update, contains_value, json, from_json |
+| net | 12 | get, post, headers, resolve, ping, scan, ip, download, urlencode, urldecode, base64enc, base64dec |
 
 ## 앱 개발
 

@@ -1,0 +1,38 @@
+{
+    "name": "map",
+    "version": "1.1.1",
+    "type": "python",
+    "description": "Dictionary/map utilities mirroring Python's dict methods",
+    "module": "app",
+    "commands": {
+        "new":     { "description": "Create an empty map, or from alternating key value args", "args": [{"name": "pairs", "optional": true}] },
+        "set":     { "description": "Return a new map with key set to value",                  "args": [{"name": "m"}, {"name": "key"}, {"name": "value"}] },
+        "get": {
+            "description": "Get a value by key",
+            "args": [{"name": "m"}, {"name": "key"}],
+            "options": {
+                "default": {"type": "string", "description": "Value to return if key is missing"}
+            }
+        },
+        "del":     { "description": "Return a new map with key removed",                      "args": [{"name": "m"}, {"name": "key"}] },
+        "has":     { "description": "Return true if map contains key",                        "args": [{"name": "m"}, {"name": "key"}] },
+        "keys":    { "description": "Return a list of all keys",                              "args": [{"name": "m"}] },
+        "values":  { "description": "Return a list of all values",                            "args": [{"name": "m"}] },
+        "items":   { "description": "Return a list of [key, value] pairs",                    "args": [{"name": "m"}] },
+        "len":     { "description": "Return the number of keys",                              "args": [{"name": "m"}] },
+        "merge":   { "description": "Merge two maps (right wins on conflict)",                "args": [{"name": "m1"}, {"name": "m2"}] },
+        "pop": {
+            "description": "Return the value for key and return a new map without it",
+            "args": [{"name": "m"}, {"name": "key"}, {"name": "varname"}]
+        },
+        "select":  { "description": "Return a sub-map containing only the listed keys",       "args": [{"name": "m"}] },
+        "omit":    { "description": "Return a map excluding the listed keys",                 "args": [{"name": "m"}] },
+        "invert":  { "description": "Swap keys and values",                                   "args": [{"name": "m"}] },
+        "from_pairs": { "description": "Create a map from a list of [key, value] pairs",     "args": [{"name": "pairs"}] },
+        "from_lists": { "description": "Create a map from a keys list and a values list",    "args": [{"name": "keys"}, {"name": "values"}] },
+        "update":  { "description": "Alias for map:set — set key to value in place (mutates var)", "args": [{"name": "varname"}, {"name": "key"}, {"name": "value"}] },
+        "contains_value": { "description": "Return true if value exists anywhere in the map", "args": [{"name": "m"}, {"name": "value"}] },
+        "json":    { "description": "Serialize map to a JSON string",                         "args": [{"name": "m"}] },
+        "from_json": { "description": "Parse a JSON string into a map",                      "args": [{"name": "s"}] }
+    }
+}

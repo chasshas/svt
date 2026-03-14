@@ -35,17 +35,35 @@ svt/
     ├── exec/            # run, eval, lines, file
     ├── event/           # on, once, off, emit, list, clear
     ├── math/            # 41 commands: arithmetic, trig, log, rounding, constants, random, conversion
-    └── shell/           # exec, run, pipe, env, setenv, cd, pwd, which, exit_code
+    ├── shell/           # exec, run, pipe, env, setenv, cd, pwd, which, exit_code
+    ├── str/             # 31 commands: upper/lower/title/capitalize/swapcase, strip, split, join,
+    │                    # replace, find, contains, startswith/endswith, len, slice, count, repeat,
+    │                    # reverse, pad, chars, lines, format, is*, sub, match, extract (regex)
+    ├── time/            # 28 commands: now, today, timestamp, from_timestamp, parse, format,
+    │                    # add/sub/diff, year/month/day/hour/minute/second, weekday, weekday_name,
+    │                    # month_name, is_leap, days_in_month, to_timestamp, to_iso, sleep, perf,
+    │                    # make, compare, between, timezone
+    ├── log/             # 22 commands: debug/info/warning/error/critical, log, level, format, name,
+    │                    # add_file/remove_file, add_console/remove_console, handlers, clear_handlers,
+    │                    # history, tail, clear_history, enable/disable, reset, stats
+    ├── list/            # 30 commands: new, push, pop, get, set, del, len, sort, reverse, slice,
+    │                    # contains, index, count, insert, extend, flatten, unique, join, head, tail,
+    │                    # zip, sum, min, max, avg, filter, map_str, range, sample, shuffle
+    ├── map/             # 20 commands: new, set, get, del, has, keys, values, items, len, merge,
+    │                    # pop, select, omit, invert, from_pairs, from_lists, update,
+    │                    # contains_value, json, from_json
+    └── net/             # 12 commands: get, post, headers, resolve, ping, scan, ip, download,
+                         # urlencode, urldecode, base64enc, base64dec
 ```
 
 ## How to Run / Test
 
 ```bash
 # From the parent directory of svt/
-python -m svt                        # Interactive REPL
-python -m svt script.svt             # Run a script file
-python -m svt -e "io:print hello"    # Execute inline command
-python -m svt -e "sys:apps"          # List all loaded apps
+python -m main.py                        # Interactive REPL
+python -m main.py script.svt             # Run a script file
+python -m main.py -e "io:print hello"    # Execute inline command
+python -m main.py -e "sys:apps"          # List all loaded apps
 ```
 
 ## Execution Pipeline
