@@ -1,0 +1,70 @@
+{
+    "name": "debug",
+    "version": "1.0.0",
+    "type": "python",
+    "description": "Code debugging utilities: inspect variables, assert conditions, time and benchmark commands",
+    "module": "app",
+    "commands": {
+        "inspect": {
+            "description": "Inspect a variable: show name, type, length, and value",
+            "args": [{"name": "var_name", "type": "string"}]
+        },
+        "typeof": {
+            "description": "Return the Python type name of a variable",
+            "args": [{"name": "var_name", "type": "string"}]
+        },
+        "dump": {
+            "description": "Pretty-print a variable's value as formatted JSON",
+            "args": [{"name": "var_name", "type": "string"}]
+        },
+        "assert": {
+            "description": "Assert a value is truthy, or equals an expected value. Raises SVTException on failure.",
+            "args": [
+                {"name": "value", "type": "any"},
+                {"name": "expected", "type": "any", "optional": true}
+            ]
+        },
+        "assert_eq": {
+            "description": "Assert two values are equal. Raises SVTException on failure.",
+            "args": [
+                {"name": "actual", "type": "any"},
+                {"name": "expected", "type": "any"}
+            ]
+        },
+        "assert_ne": {
+            "description": "Assert two values are not equal. Raises SVTException on failure.",
+            "args": [
+                {"name": "actual", "type": "any"},
+                {"name": "expected", "type": "any"}
+            ]
+        },
+        "time": {
+            "description": "Time the execution of a command and print elapsed ms",
+            "args": [{"name": "command", "type": "string"}, {"name": "args", "type": "any", "optional": true}]
+        },
+        "bench": {
+            "description": "Benchmark a command N times, print avg/min/max ms",
+            "args": [
+                {"name": "n", "type": "int"},
+                {"name": "command", "type": "string"},
+                {"name": "args", "type": "any", "optional": true}
+            ]
+        },
+        "echo": {
+            "description": "Echo all received args and options back — useful for debugging call sites"
+        },
+        "vars": {
+            "description": "List all current variables (delegates to var:list)",
+            "options": {
+                "scope": {"type": "string", "description": "all|local|global (default: all)"}
+            }
+        },
+        "stack": {
+            "description": "Show the current variable scope stack depth"
+        },
+        "trace": {
+            "description": "Trace-execute lines from a block, printing each line before running it",
+            "block": false
+        }
+    }
+}

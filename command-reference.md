@@ -1,6 +1,6 @@
 # SVT Command Reference
 
-Complete reference for all 272 built-in commands across 15 apps.
+Complete reference for all 284 built-in commands across 16 apps.
 
 ---
 
@@ -570,3 +570,89 @@ flow:end
 | `net:urldecode` | `net:urldecode <text>` | decoded string |
 | `net:base64enc` | `net:base64enc <text>` | Base64-encoded string |
 | `net:base64dec` | `net:base64dec <text>` | decoded string |
+
+---
+
+## file — File System Utilities (24 commands)
+
+### Reading & Writing
+
+| Command | Usage | Returns | Description |
+|---------|-------|---------|-------------|
+| `file:read` | `file:read <path>` | string | Read entire file as string. |
+| `file:write` | `file:write <path> <content>` | path | Write string to file (overwrite). |
+| `file:append` | `file:append <path> <content>` | path | Append string to file. |
+| `file:lines` | `file:lines <path>` | list | Read file as list of lines. |
+| `file:touch` | `file:touch <path>` | path | Create file if it doesn't exist. |
+
+### Copy, Move & Delete
+
+| Command | Usage | Returns | Description |
+|---------|-------|---------|-------------|
+| `file:copy` | `file:copy <src> <dst>` | dst path | Copy file or directory. |
+| `file:move` | `file:move <src> <dst>` | dst path | Move/rename file or directory. |
+| `file:rm` | `file:rm <path> [--r]` | `True` | Remove file. `--r` removes directory recursively. |
+
+### Directories
+
+| Command | Usage | Returns | Description |
+|---------|-------|---------|-------------|
+| `file:mkdir` | `file:mkdir <path> [--p]` | path | Create directory. `--p` creates parents. |
+| `file:ls` | `file:ls [path] [--a] [--l]` | list | List directory contents. |
+| `file:find` | `file:find <dir> [--name pat] [--type f\|d]` | list | Recursively find files/dirs. |
+| `file:grep` | `file:grep <path> <pattern> [--i] [--n]` | list | Search file for regex matches. Returns list of matching lines. |
+| `file:tempdir` | `file:tempdir` | path | Create a temporary directory. |
+| `file:tempfile` | `file:tempfile [--suffix s]` | path | Create a temporary file. |
+
+### Path & Stat
+
+| Command | Usage | Returns | Description |
+|---------|-------|---------|-------------|
+| `file:exists` | `file:exists <path>` | `True`/`False` | Check if path exists. |
+| `file:isfile` | `file:isfile <path>` | `True`/`False` | Check if path is a file. |
+| `file:isdir` | `file:isdir <path>` | `True`/`False` | Check if path is a directory. |
+| `file:stat` | `file:stat <path>` | dict | File metadata: size, mtime, ctime, mode. |
+| `file:size` | `file:size <path>` | int | File size in bytes. |
+| `file:ext` | `file:ext <path>` | string | File extension (e.g., `".py"`). |
+| `file:basename` | `file:basename <path>` | string | Filename without directory. |
+| `file:dirname` | `file:dirname <path>` | string | Directory portion of path. |
+| `file:abspath` | `file:abspath <path>` | string | Absolute path. |
+| `file:join` | `file:join <a> <b> [...]` | string | Join path components. |
+
+---
+
+## debug — Code Debugging Utilities (12 commands)
+
+### Variable Inspection
+
+| Command | Usage | Returns | Description |
+|---------|-------|---------|-------------|
+| `debug:inspect` | `debug:inspect <var_name>` | value | Print name, type, length (if applicable), and repr of a variable. |
+| `debug:typeof` | `debug:typeof <var_name>` | string | Return the Python type name (`int`, `str`, `list`, `dict`, …). |
+| `debug:dump` | `debug:dump <var_name>` | value | Pretty-print a variable's value as formatted JSON (falls back to pprint). |
+| `debug:vars` | `debug:vars [--scope all\|local\|global]` | dict | List all current variables. Delegates to `var:list`. |
+| `debug:stack` | `debug:stack` | int | Show and return the current variable scope stack depth. |
+
+### Assertions
+
+All assert commands raise `SVTException` on failure, which is caught by `flow:try/catch`.
+
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `debug:assert` | `debug:assert <value> [expected]` | Assert value is truthy. If `expected` is provided, assert `value == expected`. |
+| `debug:assert_eq` | `debug:assert_eq <actual> <expected>` | Assert `actual == expected`. |
+| `debug:assert_ne` | `debug:assert_ne <actual> <expected>` | Assert `actual != expected`. |
+
+### Timing & Benchmarking
+
+| Command | Usage | Returns | Description |
+|---------|-------|---------|-------------|
+| `debug:time` | `debug:time <cmd> [args...]` | float (ms) | Execute a command once, print elapsed milliseconds. |
+| `debug:bench` | `debug:bench <n> <cmd> [args...]` | dict | Run command N times, print runs/total/avg/min/max ms. Returns stats dict. |
+
+### Call-site Helpers
+
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `debug:echo` | `debug:echo [args...]` | Print the raw input, resolved args list, and options dict — useful for debugging argument passing. |
+| `debug:trace` | `debug:trace <cmd> [args...]` | Print each argument as a command line (`>> line`) then execute it. |

@@ -54,9 +54,11 @@ svt/
     │                    # contains_value, json, from_json
     ├── net/             # 12 commands: get, post, headers, resolve, ping, scan, ip, download,
     │                    # urlencode, urldecode, base64enc, base64dec
-    └── file/            # 24 commands: read, write, append, copy, move, rm, mkdir, ls,
-                         # exists, isfile, isdir, stat, size, ext, basename, dirname,
-                         # abspath, join, find, grep, lines, touch, tempdir, tempfile
+    ├── file/            # 24 commands: read, write, append, copy, move, rm, mkdir, ls,
+    │                    # exists, isfile, isdir, stat, size, ext, basename, dirname,
+    │                    # abspath, join, find, grep, lines, touch, tempdir, tempfile
+    └── debug/           # 12 commands: inspect, typeof, dump, vars, stack,
+                         # assert, assert_eq, assert_ne, time, bench, echo, trace
 ```
 
 ## How to Run / Test
