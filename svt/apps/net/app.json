@@ -1,6 +1,6 @@
 {
     "name": "net",
-    "version": "1.1.1",
+    "version": "1.0.0",
     "type": "python",
     "description": "Networking utilities: HTTP requests, DNS, ping, port scan, IP info",
     "module": "app",

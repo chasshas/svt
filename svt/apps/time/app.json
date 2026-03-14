@@ -1,6 +1,6 @@
 {
     "name": "time",
-    "version": "1.1.1",
+    "version": "1.0.0",
     "type": "python",
     "description": "Date and time utilities wrapping Python's datetime and time modules",
     "module": "app",

@@ -56,7 +56,10 @@ svt/                              # Python package root
 │   ├── math/                     # 41 commands (165 lines)
 │   │   ├── app.json
 │   │   └── app.py
-│   └── shell/                    # 9 commands  (113 lines)
+│   ├── shell/                    # 9 commands  (113 lines)
+│   │   ├── app.json
+│   │   └── app.py
+│   └── file/                     # 24 commands (417 lines)
 │       ├── app.json
 │       └── app.py
 │
@@ -72,9 +75,9 @@ svt/                              # Python package root
 ```
 
 ### Total Metrics
-- **Source files:** 16 Python + 8 JSON = 24 files
-- **Total Python lines:** ~1,871
-- **Total commands:** 105 across 8 apps
+- **Source files:** 18 Python + 9 JSON = 27 files
+- **Total Python lines:** ~2,288
+- **Total commands:** 272 across 15 apps
 - **External dependencies:** None (pure stdlib)
 
 ---

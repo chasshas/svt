@@ -17,13 +17,13 @@ svt/
 ├── main.py              # 진입점
 ├── core/                # 엔진 (파서, 디스패처, 블록 수집)
 ├── sdk/                 # 앱 개발용 SDK (ExecutionContext, VariableStore, EventBus)
-├── apps/                # 내장 앱 14개 (248개 커맨드)
+├── apps/                # 내장 앱 15개 (272개 커맨드)
 │   ├── sys/   var/   io/   flow/   exec/   event/   math/   shell/
-│   ├── str/   time/  log/  list/   map/    net/
+│   ├── str/   time/  log/  list/   map/    net/     file/
 ├── docs/                # 상세 문서
 │   ├── architecture.md      # 아키텍처 심층 분석
 │   ├── app-development.md   # 앱 개발 가이드
-│   ├── command-reference.md # 전체 커맨드 레퍼런스 (248개)
+│   ├── command-reference.md # 전체 커맨드 레퍼런스 (272개)
 │   └── data-structures.md   # 자료구조 / 파일 형식
 ├── CLAUDE.md            # Claude Code 프로젝트 컨텍스트
 ├── AGENTS.md            # 범용 AI 에이전트 컨텍스트
@@ -110,7 +110,7 @@ var:set score 100                      # → "변경!"
 event:emit custom_event
 ```
 
-## 내장 앱 요약 (14개, 248개 커맨드)
+## 내장 앱 요약 (15개, 272개 커맨드)
 
 | 앱 | 수 | 설명 |
 |----|-----|------|
@@ -128,6 +128,7 @@ event:emit custom_event
 | list | 30 | new, push, pop, get, set, del, len, sort, reverse, slice, contains, index, count, insert, extend, flatten, unique, join, head, tail, zip, sum/min/max/avg, filter, map_str, range, sample, shuffle |
 | map | 20 | new, set, get, del, has, keys, values, items, len, merge, pop, select, omit, invert, from_pairs, from_lists, update, contains_value, json, from_json |
 | net | 12 | get, post, headers, resolve, ping, scan, ip, download, urlencode, urldecode, base64enc, base64dec |
+| file | 24 | read, write, append, copy, move, rm, mkdir, ls, exists, isfile, isdir, stat, size, ext, basename, dirname, abspath, join, find, grep, lines, touch, tempdir, tempfile |
 
 ## 앱 개발
 

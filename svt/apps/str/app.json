@@ -1,6 +1,6 @@
 {
     "name": "str",
-    "version": "1.1.1",
+    "version": "1.0.0",
     "type": "python",
     "description": "String utilities mirroring Python's str methods",
     "module": "app",

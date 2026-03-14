@@ -1,6 +1,6 @@
 {
     "name": "log",
-    "version": "1.1.1",
+    "version": "1.0.0",
     "type": "python",
     "description": "Structured logging with levels, handlers, formatters, and history — mirrors Python's logging module",
     "module": "app",

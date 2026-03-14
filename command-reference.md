@@ -1,6 +1,6 @@
 # SVT Command Reference
 
-Complete reference for all 248 built-in commands across 14 apps.
+Complete reference for all 272 built-in commands across 15 apps.
 
 ---
 
@@ -553,6 +553,7 @@ flow:end
 | `net:download` | `net:download <url> <dest> [--timeout n] [--insecure]` | dest path | Download URL to local file. |
 
 ### DNS & Network
+
 
 | Command | Usage | Returns | Description |
 |---------|-------|---------|-------------|

@@ -46,6 +46,6 @@ from svt.sdk import SVTException  # For throwable errors
 
 ## Project Stats
 
-- 14 apps, 248 commands, ~1,871+ lines of Python
+- 15 apps, 272 commands, ~1,871+ lines of Python
 - Python 3.10+, stdlib only, no external dependencies
 - Apps discovered at startup from `svt/apps/` and `~/.svt/apps/`

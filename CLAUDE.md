@@ -52,8 +52,11 @@ svt/
     ├── map/             # 20 commands: new, set, get, del, has, keys, values, items, len, merge,
     │                    # pop, select, omit, invert, from_pairs, from_lists, update,
     │                    # contains_value, json, from_json
-    └── net/             # 12 commands: get, post, headers, resolve, ping, scan, ip, download,
-                         # urlencode, urldecode, base64enc, base64dec
+    ├── net/             # 12 commands: get, post, headers, resolve, ping, scan, ip, download,
+    │                    # urlencode, urldecode, base64enc, base64dec
+    └── file/            # 24 commands: read, write, append, copy, move, rm, mkdir, ls,
+                         # exists, isfile, isdir, stat, size, ext, basename, dirname,
+                         # abspath, join, find, grep, lines, touch, tempdir, tempfile
 ```
 
 ## How to Run / Test
